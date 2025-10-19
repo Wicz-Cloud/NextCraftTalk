@@ -7,7 +7,8 @@ Handles configuration loading and mode detection for dual deployment modes.
 import os
 from pathlib import Path
 from typing import Optional
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 from enum import Enum
 
 
@@ -23,11 +24,19 @@ class NextcloudConfig(BaseSettings):
     password: str = Field(..., env="NEXTCLOUD_PASSWORD")
     room_token: str = Field(..., env="TALK_ROOM_TOKEN")
 
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
+
 
 class ExternalAIConfig(BaseSettings):
     """External AI (x.ai) configuration"""
     api_key: str = Field(..., env="XAI_API_KEY")
     base_url: str = Field(default="https://api.x.ai/v1", env="XAI_BASE_URL")
+
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
 
 
 class SelfHostedConfig(BaseSettings):
@@ -38,11 +47,19 @@ class SelfHostedConfig(BaseSettings):
     wiki_base_url: str = Field(default="", env="WIKI_BASE_URL")
     scraping_interval_hours: int = Field(default=24, env="SCRAPING_INTERVAL_HOURS")
 
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
+
 
 class LoggingConfig(BaseSettings):
     """Logging configuration"""
     level: str = Field(default="INFO", env="LOG_LEVEL")
     file: str = Field(default="logs/nextcraft.log", env="LOG_FILE")
+
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
 
 
 class WebhookConfig(BaseSettings):
@@ -50,31 +67,42 @@ class WebhookConfig(BaseSettings):
     port: int = Field(default=8080, env="WEBHOOK_PORT")
     host: str = Field(default="0.0.0.0", env="WEBHOOK_HOST")
 
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
+
 
 class Config(BaseSettings):
     """Main configuration class"""
     deployment_mode: DeploymentMode = Field(default=DeploymentMode.EXTERNAL_AI, env="DEPLOYMENT_MODE")
 
-    nextcloud: NextcloudConfig
-    logging: LoggingConfig
-    webhook: WebhookConfig
-
-    # Mode-specific configs (loaded conditionally)
-    external_ai: Optional[ExternalAIConfig] = None
-    self_hosted: Optional[SelfHostedConfig] = None
-
     class Config:
         env_file = ".env"
-        case_sensitive = False
+        extra = "ignore"
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    @property
+    def nextcloud(self) -> NextcloudConfig:
+        return NextcloudConfig()
 
-        # Load mode-specific configuration
+    @property
+    def logging(self) -> LoggingConfig:
+        return LoggingConfig()
+
+    @property
+    def webhook(self) -> WebhookConfig:
+        return WebhookConfig()
+
+    @property
+    def external_ai(self) -> Optional[ExternalAIConfig]:
         if self.deployment_mode == DeploymentMode.EXTERNAL_AI:
-            self.external_ai = ExternalAIConfig()
-        elif self.deployment_mode == DeploymentMode.SELF_HOSTED:
-            self.self_hosted = SelfHostedConfig()
+            return ExternalAIConfig()
+        return None
+
+    @property
+    def self_hosted(self) -> Optional[SelfHostedConfig]:
+        if self.deployment_mode == DeploymentMode.SELF_HOSTED:
+            return SelfHostedConfig()
+        return None
 
 
 # Global config instance

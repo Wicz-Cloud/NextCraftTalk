@@ -5,7 +5,7 @@ Shared utilities for NextCraftTalk
 import logging
 from pathlib import Path
 from typing import Optional
-from .core.config import get_config
+from ..core.config import get_config
 
 
 def setup_logging() -> None:

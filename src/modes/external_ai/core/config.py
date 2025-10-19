@@ -1,0 +1,114 @@
+"""
+Configuration compatibility layer for NextCraftTalk-EXT code
+
+Adapts the unified NextCraftTalk configuration to work with existing NextCraftTalk-EXT code.
+"""
+
+from pathlib import Path
+from typing import Optional
+
+from ...core.config import get_config
+
+
+class Settings:
+    """Compatibility wrapper for NextCraftTalk-EXT settings"""
+
+    def __init__(self):
+        self._config = get_config()
+
+    @property
+    def bot_port(self) -> int:
+        """Bot port from unified config"""
+        return self._config.webhook.port
+
+    @property
+    def bot_name(self) -> str:
+        """Bot name (placeholder)"""
+        return "NextCraftTalkBot"
+
+    @property
+    def bot_display_name(self) -> str:
+        """Bot display name (placeholder)"""
+        return "NextCraftTalk Assistant"
+
+    @property
+    def network_name(self) -> str:
+        """Docker network name (placeholder)"""
+        return "nextcraft-network"
+
+    @property
+    def nextcloud_url(self) -> Optional[str]:
+        """Nextcloud URL from unified config"""
+        return self._config.nextcloud.url
+
+    @property
+    def nextcloud_bot_token(self) -> Optional[str]:
+        """Nextcloud bot token (mapped from room token)"""
+        return self._config.nextcloud.room_token
+
+    @property
+    def shared_secret(self) -> Optional[str]:
+        """Shared secret for webhook verification (placeholder)"""
+        return None  # TODO: Add to unified config if needed
+
+    @property
+    def xai_api_key(self) -> Optional[str]:
+        """x.ai API key from unified config"""
+        if self._config.external_ai:
+            return self._config.external_ai.api_key
+        return None
+
+    @property
+    def xai_url(self) -> str:
+        """x.ai API URL from unified config"""
+        if self._config.external_ai:
+            return self._config.external_ai.base_url
+        return "https://api.x.ai/v1"
+
+    @property
+    def model_name(self) -> str:
+        """x.ai model name (placeholder)"""
+        return "grok-4-fast-non-reasoning"
+
+    @property
+    def prompt_template_path(self) -> str:
+        """Prompt template path"""
+        return "prompt_template.txt"
+
+    @property
+    def max_workers(self) -> int:
+        """Max workers (placeholder)"""
+        return 2
+
+    @property
+    def batch_size(self) -> int:
+        """Batch size (placeholder)"""
+        return 50
+
+    @property
+    def log_level(self) -> str:
+        """Log level from unified config"""
+        return self._config.logging.level
+
+    @property
+    def log_file(self) -> str:
+        """Log file from unified config"""
+        return self._config.logging.file
+
+    @property
+    def verbose_logging(self) -> bool:
+        """Verbose logging (placeholder)"""
+        return False
+
+    @property
+    def log_path(self) -> Path:
+        """Get the log file path"""
+        return Path(self.log_file)
+
+    def ensure_log_directory(self) -> None:
+        """Ensure log directory exists"""
+        self.log_path.parent.mkdir(parents=True, exist_ok=True)
+
+
+# Global settings instance for compatibility
+settings = Settings()
