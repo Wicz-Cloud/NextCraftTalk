@@ -4,12 +4,11 @@ NextCraftTalk Configuration Module
 Handles configuration loading and mode detection for dual deployment modes.
 """
 
-import os
-from pathlib import Path
+from enum import Enum
 from typing import Optional
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
-from enum import Enum
 
 
 class DeploymentMode(str, Enum):
@@ -19,6 +18,7 @@ class DeploymentMode(str, Enum):
 
 class NextcloudConfig(BaseSettings):
     """Nextcloud Talk configuration"""
+
     url: str = Field(..., env="NEXTCLOUD_URL")
     username: str = Field(..., env="NEXTCLOUD_USERNAME")
     password: str = Field(..., env="NEXTCLOUD_PASSWORD")
@@ -31,6 +31,7 @@ class NextcloudConfig(BaseSettings):
 
 class ExternalAIConfig(BaseSettings):
     """External AI (x.ai) configuration"""
+
     api_key: str = Field(..., env="XAI_API_KEY")
     base_url: str = Field(default="https://api.x.ai/v1", env="XAI_BASE_URL")
 
@@ -41,9 +42,14 @@ class ExternalAIConfig(BaseSettings):
 
 class SelfHostedConfig(BaseSettings):
     """Self-hosted AI configuration"""
-    ollama_base_url: str = Field(default="http://localhost:11434", env="OLLAMA_BASE_URL")
+
+    ollama_base_url: str = Field(
+        default="http://localhost:11434", env="OLLAMA_BASE_URL"
+    )
     ollama_model: str = Field(default="llama2", env="OLLAMA_MODEL")
     chroma_db_path: str = Field(default="./data/chroma_db", env="CHROMA_DB_PATH")
+    chroma_db_host: str = Field(default="", env="CHROMA_DB_HOST")
+    chroma_db_port: int = Field(default=8000, env="CHROMA_DB_PORT")
     wiki_base_url: str = Field(default="", env="WIKI_BASE_URL")
     scraping_interval_hours: int = Field(default=24, env="SCRAPING_INTERVAL_HOURS")
 
@@ -54,6 +60,7 @@ class SelfHostedConfig(BaseSettings):
 
 class LoggingConfig(BaseSettings):
     """Logging configuration"""
+
     level: str = Field(default="INFO", env="LOG_LEVEL")
     file: str = Field(default="logs/nextcraft.log", env="LOG_FILE")
 
@@ -64,6 +71,7 @@ class LoggingConfig(BaseSettings):
 
 class WebhookConfig(BaseSettings):
     """Webhook configuration"""
+
     port: int = Field(default=8080, env="WEBHOOK_PORT")
     host: str = Field(default="0.0.0.0", env="WEBHOOK_HOST")
 
@@ -74,7 +82,10 @@ class WebhookConfig(BaseSettings):
 
 class Config(BaseSettings):
     """Main configuration class"""
-    deployment_mode: DeploymentMode = Field(default=DeploymentMode.EXTERNAL_AI, env="DEPLOYMENT_MODE")
+
+    deployment_mode: DeploymentMode = Field(
+        default=DeploymentMode.EXTERNAL_AI, env="DEPLOYMENT_MODE"
+    )
 
     class Config:
         env_file = ".env"

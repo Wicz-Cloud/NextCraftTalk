@@ -19,4 +19,9 @@ pre-commit>=3.5.0
 
 # Optional: Add mode-specific dependencies as needed
 # For external AI mode: openai>=1.0.0 (if using OpenAI-compatible API)
-# For self-hosted mode: chromadb, ollama, beautifulsoup4, etc.
+# For self-hosted mode:
+chromadb>=0.4.0
+sentence-transformers>=2.0.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+requests>=2.31.0

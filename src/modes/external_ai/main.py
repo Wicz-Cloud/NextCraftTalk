@@ -5,6 +5,7 @@ Integrates NextCraftTalk-EXT code with unified configuration system.
 """
 
 import logging
+
 import uvicorn
 
 from ...core.config import get_config
@@ -14,6 +15,7 @@ from ...shared.utils import setup_logging
 def run_external_ai():
     """Run the external AI mode application"""
     config = get_config()
+    setup_logging()
 
     logger = logging.getLogger(__name__)
     logger.info("🚀 Starting NextCraftTalk in External AI mode")
@@ -21,7 +23,7 @@ def run_external_ai():
         "src.modes.external_ai.bot.api:app",
         host=config.webhook.host,
         port=config.webhook.port,
-        reload=True
+        reload=True,
     )
 
 

@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  nextcraft-selfhosted:
+    build:
+      context: ../..
+      dockerfile: docker/self_hosted/Dockerfile
+    ports:
+      - "${WEBHOOK_PORT:-8081}:8080"
+    env_file:
+      - ../../.env
+    volumes:
+      - ../../logs:/app/logs
+      - ../../data:/app/data
+    depends_on:
+      - ollama
+      - chromadb
+    networks:
+      - nextcraft
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nextcraft-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - nextcraft
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: nextcraft-chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    networks:
+      - nextcraft
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+    driver: local
+  chromadb_data:
+    driver: local
+
+networks:
+  nextcraft:
+    driver: bridge

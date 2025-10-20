@@ -4,7 +4,7 @@ Shared utilities for NextCraftTalk
 
 import logging
 from pathlib import Path
-from typing import Optional
+
 from ..core.config import get_config
 
 
@@ -13,11 +13,8 @@ def setup_logging() -> None:
     config = get_config()
     logging.basicConfig(
         level=getattr(logging, config.logging.level.upper()),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(config.logging.file),
-            logging.StreamHandler()
-        ]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.FileHandler(config.logging.file), logging.StreamHandler()],
     )
 
 
@@ -45,6 +42,7 @@ def get_project_root() -> Path:
 def load_env_file(env_file: str = ".env") -> None:
     """Load environment variables from file"""
     from dotenv import load_dotenv
+
     env_path = get_project_root() / env_file
     if env_path.exists():
         load_dotenv(env_path)
