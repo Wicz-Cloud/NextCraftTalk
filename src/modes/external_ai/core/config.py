@@ -4,6 +4,7 @@ Configuration compatibility layer for NextCraftTalk-EXT code
 Adapts the unified NextCraftTalk configuration to work with existing NextCraftTalk-EXT code.
 """
 
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -43,7 +44,10 @@ class Settings:
 
     @property
     def nextcloud_bot_token(self) -> Optional[str]:
-        """Nextcloud bot token (mapped from room token)"""
+        """Nextcloud bot token (use password if available, otherwise room token)"""
+        # Try password first (for bot token auth), then room token
+        if self._config.nextcloud.password:
+            return self._config.nextcloud.password
         return self._config.nextcloud.room_token
 
     @property
@@ -67,8 +71,8 @@ class Settings:
 
     @property
     def model_name(self) -> str:
-        """x.ai model name (placeholder)"""
-        return "grok-4-fast-non-reasoning"
+        """x.ai model name (from .env or default)"""
+        return os.getenv("MODEL_NAME", "grok-4-fast-non-reasoning")
 
     @property
     def prompt_template_path(self) -> str:
