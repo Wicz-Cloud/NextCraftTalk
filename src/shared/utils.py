@@ -5,16 +5,16 @@ Shared utilities for NextCraftTalk
 import logging
 from pathlib import Path
 
-from ..core.config import get_config
+from ..core.config import DeploymentMode, get_config
 
 
 def setup_logging() -> None:
     """Setup logging configuration"""
     config = get_config()
     logging.basicConfig(
-        level=getattr(logging, config.logging.level.upper()),
+        level=getattr(logging, config.log_level.upper()),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[logging.FileHandler(config.logging.file), logging.StreamHandler()],
+        handlers=[logging.FileHandler(config.log_file), logging.StreamHandler()],
     )
 
 
@@ -27,8 +27,8 @@ def ensure_directories() -> None:
 
     # Add mode-specific directories
     config = get_config()
-    if config.self_hosted:
-        dirs.append(Path(config.self_hosted.chroma_db_path).parent)
+    if config.deployment_mode == DeploymentMode.SELF_HOSTED:
+        dirs.append(Path(config.chroma_db_path).parent)
 
     for dir_path in dirs:
         dir_path.mkdir(parents=True, exist_ok=True)

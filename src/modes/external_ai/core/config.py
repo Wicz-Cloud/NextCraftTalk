@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from ....core.config import get_config
+from src.core.config import get_config
 
 
 class Settings:
@@ -20,7 +20,7 @@ class Settings:
     @property
     def bot_port(self) -> int:
         """Bot port from unified config"""
-        return self._config.webhook.port
+        return self._config.webhook_port
 
     @property
     def bot_name(self) -> str:
@@ -40,15 +40,13 @@ class Settings:
     @property
     def nextcloud_url(self) -> Optional[str]:
         """Nextcloud URL from unified config"""
-        return self._config.nextcloud.url
+        return self._config.nextcloud_url
 
     @property
     def nextcloud_bot_token(self) -> Optional[str]:
         """Nextcloud bot token (use password if available, otherwise room token)"""
         # Try password first (for bot token auth), then room token
-        if self._config.nextcloud.password:
-            return self._config.nextcloud.password
-        return self._config.nextcloud.room_token
+        return self._config.nextcloud_password
 
     @property
     def shared_secret(self) -> Optional[str]:
@@ -58,16 +56,12 @@ class Settings:
     @property
     def xai_api_key(self) -> Optional[str]:
         """x.ai API key from unified config"""
-        if self._config.external_ai:
-            return self._config.external_ai.api_key
-        return None
+        return self._config.xai_api_key
 
     @property
     def xai_url(self) -> str:
         """x.ai API URL from unified config"""
-        if self._config.external_ai:
-            return self._config.external_ai.base_url
-        return "https://api.x.ai/v1"
+        return self._config.xai_base_url
 
     @property
     def model_name(self) -> str:
@@ -92,12 +86,12 @@ class Settings:
     @property
     def log_level(self) -> str:
         """Log level from unified config"""
-        return self._config.logging.level
+        return self._config.log_level
 
     @property
     def log_file(self) -> str:
         """Log file from unified config"""
-        return self._config.logging.file
+        return self._config.log_file
 
     @property
     def verbose_logging(self) -> bool:

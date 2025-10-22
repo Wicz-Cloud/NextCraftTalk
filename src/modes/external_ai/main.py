@@ -8,8 +8,8 @@ import logging
 
 import uvicorn
 
-from ....core.config import get_config
-from ....shared.utils import setup_logging
+from src.core.config import get_config
+from src.shared.utils import setup_logging
 
 
 def run_external_ai():
@@ -21,8 +21,8 @@ def run_external_ai():
     logger.info("🚀 Starting NextCraftTalk in External AI mode")
     uvicorn.run(
         "src.modes.external_ai.bot.api:app",
-        host=config.webhook.host,
-        port=config.webhook.port,
+        host=config.webhook_host,
+        port=config.webhook_port,
         reload=True,
     )
 

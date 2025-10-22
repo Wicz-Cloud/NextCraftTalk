@@ -5,7 +5,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_DIR"
 
 # Colors for output
 RED='\033[0;31m'
@@ -74,12 +75,42 @@ setup_directories() {
     fi
 }
 
+# Configure Docker network in compose file
+configure_docker_network() {
+    MODE=$(get_deployment_mode)
+    COMPOSE_FILE="docker/${MODE}/docker-compose.yml"
+
+    if [ ! -f "$COMPOSE_FILE" ]; then
+        return
+    fi
+
+    # Get network name from .env
+    NETWORK_NAME=$(grep "^DOCKER_NETWORK=" .env | cut -d'=' -f2 | tr -d ' ')
+
+    if [ -z "$NETWORK_NAME" ]; then
+        log_warning "DOCKER_NETWORK not set in .env, using default 'nextcraft'"
+        NETWORK_NAME="nextcraft"
+    fi
+
+    log_info "Configuring Docker network: $NETWORK_NAME"
+
+    # Update the networks section in docker-compose.yml
+    # Replace the network name in the networks section
+    sed -i "s/nextcraft:/${NETWORK_NAME}:/g" "$COMPOSE_FILE"
+
+    # Update the service network reference
+    sed -i "s/- nextcraft/- ${NETWORK_NAME}/g" "$COMPOSE_FILE"
+}
+
 # Deploy using Docker
 deploy_docker() {
     MODE=$(get_deployment_mode)
     COMPOSE_FILE="docker/${MODE}/docker-compose.yml"
 
     if [ -f "$COMPOSE_FILE" ]; then
+        log_info "Configuring Docker network..."
+        configure_docker_network
+
         log_info "Deploying with Docker Compose (${MODE} mode)..."
         docker-compose -f "$COMPOSE_FILE" up -d
     else
