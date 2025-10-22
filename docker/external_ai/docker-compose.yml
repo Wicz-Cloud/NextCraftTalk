@@ -11,6 +11,7 @@ services:
       - ../../.env
     volumes:
       - ../../logs:/app/logs
+      - ../../prompt_template.txt:/app/prompt_template.txt
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
