@@ -102,6 +102,58 @@ configure_docker_network() {
     sed -i "s/- nextcraft/- ${NETWORK_NAME}/g" "$COMPOSE_FILE"
 }
 
+# Check Nextcloud connectivity and provide bot setup instructions
+check_nextcloud_setup() {
+    NETWORK_NAME=$(grep "^DOCKER_NETWORK=" .env | cut -d'=' -f2 | tr -d ' ' || echo "nextcloud-aio")
+
+    log_info "Checking Nextcloud connectivity on network: $NETWORK_NAME"
+
+    # Check if Nextcloud containers are accessible
+    if docker network ls | grep -q "$NETWORK_NAME"; then
+        log_info "✓ Docker network '$NETWORK_NAME' exists"
+
+        # Try to detect Nextcloud containers on the network
+        NEXTCLOUD_CONTAINERS=$(docker ps --filter "network=$NETWORK_NAME" --format "{{.Names}}" | grep -E "(nextcloud|apache)" | head -1)
+
+        if [ -n "$NEXTCLOUD_CONTAINERS" ]; then
+            log_success "✓ Found Nextcloud container(s) on network: $NEXTCLOUD_CONTAINERS"
+            log_info ""
+            log_info "🤖 Nextcloud Talk Bot Setup:"
+            log_info "=========================="
+
+            # Check if MinecraftBot is already installed
+            BOT_EXISTS=$(docker exec nextcloud-aio-nextcloud php occ talk:bot:list --output=json 2>/dev/null | jq -r '.[] | select(.name=="MinecraftBot") | .id' 2>/dev/null || echo "")
+
+            if [ -n "$BOT_EXISTS" ]; then
+                log_info "✓ MinecraftBot found (ID: $BOT_EXISTS)"
+                log_warning "⚠️  Bot may need webhook URL reconfiguration"
+                log_info ""
+                log_info "To update the webhook URL, run these commands:"
+                log_info "docker exec nextcloud-aio-nextcloud php occ talk:bot:uninstall $BOT_EXISTS"
+                log_info "docker exec nextcloud-aio-nextcloud php occ talk:bot:install MinecraftBot '' 'http://external_ai_nextcraft-external_1:8080/webhook' 'Minecraft knowledge bot for kids'"
+            else
+                log_info "❌ MinecraftBot not found"
+                log_info ""
+                log_info "To install the bot, run this command:"
+                log_info "docker exec nextcloud-aio-nextcloud php occ talk:bot:install MinecraftBot '' 'http://external_ai_nextcraft-external_1:8080/webhook' 'Minecraft knowledge bot for kids'"
+            fi
+
+            log_info ""
+            log_info "After configuring the bot:"
+            log_info "1. Add the bot to conversations: docker exec nextcloud-aio-nextcloud php occ talk:bot:setup $BOT_EXISTS <conversation-token>"
+            log_info "2. Test by mentioning @MinecraftBot in a Talk conversation"
+            log_info ""
+            log_warning "⚠️  Bot webhook URL must be accessible from Nextcloud container!"
+        else
+            log_warning "⚠️  No Nextcloud containers found on network '$NETWORK_NAME'"
+            log_info "Make sure Nextcloud AIO is running and connected to the same network"
+        fi
+    else
+        log_warning "⚠️  Docker network '$NETWORK_NAME' not found"
+        log_info "The bot may not be able to communicate with Nextcloud"
+    fi
+}
+
 # Deploy using Docker
 deploy_docker() {
     MODE=$(get_deployment_mode)
@@ -113,6 +165,9 @@ deploy_docker() {
 
         log_info "Deploying with Docker Compose (${MODE} mode)..."
         docker-compose -f "$COMPOSE_FILE" up -d
+
+        # Check Nextcloud setup after successful deployment
+        check_nextcloud_setup
     else
         log_warning "Docker Compose file not found: $COMPOSE_FILE"
         log_info "Falling back to direct Python execution..."
