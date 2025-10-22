@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from ...core.config import get_config
+from ....core.config import get_config
 
 
 class Settings:

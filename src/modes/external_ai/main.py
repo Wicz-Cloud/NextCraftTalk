@@ -8,8 +8,8 @@ import logging
 
 import uvicorn
 
-from ...core.config import get_config
-from ...shared.utils import setup_logging
+from ....core.config import get_config
+from ....shared.utils import setup_logging
 
 
 def run_external_ai():

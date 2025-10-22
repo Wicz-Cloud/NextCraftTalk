@@ -98,7 +98,12 @@ NextCraftTalk/
 
 ### Setup Development Environment
 ```bash
-pip install -r requirements.txt
+# For external AI mode
+pip install -r requirements-external.txt
+
+# For self-hosted mode
+pip install -r requirements-selfhosted.txt
+
 pre-commit install
 ```
 

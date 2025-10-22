@@ -92,7 +92,7 @@ git clone https://github.com/Wicz-Cloud/NextCraftTalk-EXT.git
 cd NextCraftTalk-EXT
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements-external.txt
 
 # Configure environment
 cp .env.example .env
@@ -341,7 +341,7 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements-external.txt
 
 # Run tests
 python -m pytest

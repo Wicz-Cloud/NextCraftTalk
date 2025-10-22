@@ -50,18 +50,16 @@ get_deployment_mode() {
 
 # Install Python dependencies
 install_dependencies() {
-    log_info "Installing Python dependencies..."
-    pip install -r requirements.txt
-
     MODE=$(get_deployment_mode)
+    log_info "Installing Python dependencies for $MODE mode..."
+
     if [ "$MODE" = "external_ai" ]; then
-        log_info "Installing external AI dependencies..."
-        # Add external AI specific packages if needed
-        # pip install openai
+        pip install -r requirements-external.txt
     elif [ "$MODE" = "self_hosted" ]; then
-        log_info "Installing self-hosted dependencies..."
-        # Add self-hosted specific packages
-        # pip install chromadb ollama beautifulsoup4
+        pip install -r requirements-selfhosted.txt
+    else
+        log_error "Unknown deployment mode: $MODE"
+        exit 1
     fi
 }
 
