@@ -127,7 +127,7 @@ def run_self_hosted():
     uvicorn.run(
         "src.modes.self_hosted.main:app",
         host=config.webhook.host,
-        port=config.webhook.port,
+        port=8080,  # Fixed internal port for container
         reload=True,
     )
 

@@ -19,10 +19,12 @@ def run_external_ai():
 
     logger = logging.getLogger(__name__)
     logger.info("🚀 Starting NextCraftTalk in External AI mode")
+    # Always bind to port 8080 inside the container
+    # External port mapping is handled by docker-compose
     uvicorn.run(
         "src.modes.external_ai.bot.api:app",
         host=config.webhook_host,
-        port=config.webhook_port,
+        port=8080,  # Fixed internal port for container
         reload=True,
     )
 
