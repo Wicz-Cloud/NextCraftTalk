@@ -79,7 +79,8 @@ async def health_check():
             },
         }
     except Exception as e:
-        return {"status": "degraded", "mode": "self_hosted", "error": str(e)}
+        logger.error(f"Health check error: {e}")
+        return {"status": "degraded", "mode": "self_hosted", "error": "Service error"}
 
 
 @app.post("/knowledge/add")
