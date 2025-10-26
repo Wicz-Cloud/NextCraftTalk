@@ -6,7 +6,9 @@ import hashlib
 import hmac
 import logging
 
-from ..core.config import settings
+from src.core.config import get_config
+
+config = get_config()
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ def verify_signature(
         logger.warning("No signature header provided - accepting for local development")
         return True  # Allow unsigned for local testing
 
-    if not settings.shared_secret:
+    if not config.shared_secret:
         logger.warning("No SHARED_SECRET configured - accepting unsigned requests")
         return True
 
@@ -42,19 +44,19 @@ def verify_signature(
 
         # Create HMAC-SHA256 signature
         expected_signature = hmac.new(
-            settings.shared_secret.encode("utf-8"), message_to_sign, hashlib.sha256
+            config.shared_secret.encode("utf-8"), message_to_sign, hashlib.sha256
         ).hexdigest()
 
         provided_signature = signature_header.lower().strip()
 
         # Only log detailed security debug info when in DEBUG mode
-        if settings.log_level.upper() == "DEBUG":
+        if config.log_level.upper() == "DEBUG":
             logger.info(f"DEBUG: Random header: {random_header}")
             logger.info(f"DEBUG: Expected signature: {expected_signature[:16]}...")
             logger.info(f"DEBUG: Received signature: {provided_signature[:16]}...")
 
         if hmac.compare_digest(provided_signature, expected_signature.lower()):
-            if settings.verbose_logging:
+            if config.verbose_logging:
                 logger.info("✓ Webhook signature verified")
             return True
         else:

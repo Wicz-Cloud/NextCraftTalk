@@ -24,4 +24,4 @@ services:
 
 networks:
   nextcloud-aio:
-    driver: bridge
+    external: true

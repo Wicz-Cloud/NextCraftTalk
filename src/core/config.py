@@ -5,6 +5,7 @@ Handles configuration loading and mode detection for dual deployment modes.
 """
 
 from enum import Enum
+from typing import Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -70,6 +71,7 @@ class WebhookConfig(BaseSettings):
 
     port: int = Field(default=8080, env="WEBHOOK_PORT")
     host: str = Field(default="0.0.0.0", env="WEBHOOK_HOST")
+    shared_secret: Optional[str] = Field(default=None, env="SHARED_SECRET")
 
     class Config:
         extra = "ignore"
@@ -109,6 +111,7 @@ class Config(BaseSettings):
     # Webhook configuration
     webhook_port: int = Field(default=8080, env="WEBHOOK_PORT")
     webhook_host: str = Field(default="0.0.0.0", env="WEBHOOK_HOST")
+    shared_secret: Optional[str] = Field(default=None, env="SHARED_SECRET")
 
     class Config:
         extra = "ignore"

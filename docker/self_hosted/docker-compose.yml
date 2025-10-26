@@ -17,7 +17,7 @@ services:
       - ollama
       - chromadb
     networks:
-      - nextcraft
+      - nextcloud-aio
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -34,7 +34,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     networks:
-      - nextcraft
+      - nextcloud-aio
     restart: unless-stopped
     environment:
       - OLLAMA_HOST=0.0.0.0
@@ -47,7 +47,7 @@ services:
     volumes:
       - chromadb_data:/chroma/chroma
     networks:
-      - nextcraft
+      - nextcloud-aio
     restart: unless-stopped
 
 volumes:
@@ -57,5 +57,5 @@ volumes:
     driver: local
 
 networks:
-  nextcraft:
+  nextcloud-aio:
     driver: bridge

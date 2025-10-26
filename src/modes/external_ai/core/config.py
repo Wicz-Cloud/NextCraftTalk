@@ -50,8 +50,8 @@ class Settings:
 
     @property
     def shared_secret(self) -> Optional[str]:
-        """Shared secret for webhook verification (placeholder)"""
-        return None  # TODO: Add to unified config if needed
+        """Shared secret for webhook verification"""
+        return self._config.shared_secret
 
     @property
     def xai_api_key(self) -> Optional[str]:

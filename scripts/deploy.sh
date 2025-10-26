@@ -40,12 +40,15 @@ check_env() {
     fi
 }
 
-# Detect deployment mode from .env
+# Get deployment mode from .env
 get_deployment_mode() {
     if [ -f ".env" ]; then
-        grep "^DEPLOYMENT_MODE=" .env | cut -d'=' -f2 | tr -d ' '
+        MODE=$(grep "^DEPLOYMENT_MODE=" .env | cut -d'=' -f2 | tr -d ' ')
+        echo -e "${BLUE}[INFO]${NC} Found .env, MODE: '$MODE'" >&2
+        echo "$MODE"
     else
-        echo "external_ai"  # Default mode
+        echo -e "${YELLOW}[WARNING]${NC} .env file not found, defaulting to external_ai" >&2
+        echo "external_ai"
     fi
 }
 
@@ -159,6 +162,9 @@ deploy_docker() {
     MODE=$(get_deployment_mode)
     COMPOSE_FILE="docker/${MODE}/docker-compose.yml"
 
+    log_info "Deployment mode: $MODE"
+    log_info "Compose file: $COMPOSE_FILE"
+
     if [ -f "$COMPOSE_FILE" ]; then
         log_info "Configuring Docker network..."
         configure_docker_network
@@ -169,14 +175,31 @@ deploy_docker() {
         # Check Nextcloud setup after successful deployment
         check_nextcloud_setup
     else
-        log_warning "Docker Compose file not found: $COMPOSE_FILE"
-        log_info "Falling back to direct Python execution..."
-        deploy_python
+        log_error "Docker Compose file not found: $COMPOSE_FILE"
+        log_error "Cannot deploy without Docker Compose configuration."
+        exit 1
     fi
 }
 
 # Deploy using Python directly
 deploy_python() {
+    MODE=$(get_deployment_mode)
+    REQUIREMENTS_FILE="requirements-${MODE}.txt"
+
+    log_info "Setting up Python virtual environment..."
+    if [ ! -d "venv" ]; then
+        python3 -m venv venv
+    fi
+    export PATH="$PWD/venv/bin:$PATH"
+
+    log_info "Installing Python dependencies for ${MODE} mode..."
+    if [ -f "$REQUIREMENTS_FILE" ]; then
+        pip install -r "$REQUIREMENTS_FILE"
+    else
+        log_warning "Requirements file not found: $REQUIREMENTS_FILE"
+        pip install -r requirements.txt
+    fi
+
     log_info "Starting NextCraftTalk with Python..."
     python main.py
 }
