@@ -4,7 +4,7 @@ pydantic>=2.0.0
 pydantic-settings>=2.0.0
 fastapi>=0.104.0
 uvicorn>=0.24.0
-requests>=2.31.0
+requests>=2.33.0
 python-multipart>=0.0.6
 
 # Logging and utilities
@@ -25,3 +25,6 @@ sentence-transformers>=5.2.0
 beautifulsoup4>=4.12.0
 lxml>=4.9.0
 requests>=2.33.0
+
+# Force urllib3 update for security
+urllib3>=2.5.0
