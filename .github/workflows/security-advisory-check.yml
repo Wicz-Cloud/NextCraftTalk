@@ -1,0 +1,43 @@
+name: Security Advisory Check
+
+on:
+  schedule:
+    - cron: "0 8 * * 1" # Weekly on Mondays at 8 AM UTC
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-advisories:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for security advisories
+        run: |
+          # Get repository information
+          REPO="${{ github.repository }}"
+          OWNER="${{ github.repository_owner }}"
+
+          # Check if there are any open security advisories
+          ADVISORIES=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/$REPO/security-advisories" | \
+            jq -r '.[] | select(.state == "published") | .ghsa_id' | wc -l)
+
+          if [ "$ADVISORIES" -gt 0 ]; then
+            echo "Found $ADVISORIES published security advisories"
+            echo "advisories_found=true" >> $GITHUB_ENV
+          else
+            echo "No published security advisories found"
+            echo "advisories_found=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create security reminder issue
+        if: env.advisories_found == 'true'
+        run: |
+          echo "Security advisories found - creating reminder issue"
+          # Note: Issue creation would require gh CLI authentication
+          # This is a placeholder for future implementation
