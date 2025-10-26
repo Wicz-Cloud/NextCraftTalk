@@ -10,11 +10,18 @@ If you discover a security vulnerability in NextCraftTalk, please help us by rep
 
 ### How to Report
 
-**Please DO NOT report security vulnerabilities through public GitHub issues.**
+**Please report security vulnerabilities by creating a new GitHub issue:**
 
-Instead, please report security vulnerabilities by emailing:
+1. Go to [Issues](https://github.com/Wicz-Cloud/NextCraftTalk/issues)
+2. Click "New Issue"
+3. Use the title format: `[SECURITY] Brief description of vulnerability`
+4. Include all relevant details in the issue body
+5. Apply the `security` label if available
+
+**⚠️ For active exploitation or emergency situations only:**
 - **Email**: security@wicz.cloud
-- **Subject**: `[SECURITY] Vulnerability Report - NextCraftTalk`
+- **Subject**: `[URGENT SECURITY] Active Exploitation - NextCraftTalk`
+- Use this channel only if there's immediate risk or active exploitation
 
 ### What to Include
 
@@ -81,8 +88,15 @@ We use the following severity levels:
 ## 📞 Contact
 
 For security-related questions or concerns:
+
+**Primary Contact (Vulnerability Reports):**
+- **GitHub Issues**: [Create new issue](https://github.com/Wicz-Cloud/NextCraftTalk/issues) with `[SECURITY]` prefix
+- **Response Time**: Within 48 hours acknowledgment, 7 days detailed response
+
+**Emergency Contact (Active Exploitation Only):**
 - **Email**: security@wicz.cloud
-- **Response Time**: Within 48 hours
+- **Use Case**: Immediate threats, active exploitation, or emergency situations
+- **Response Time**: Immediate (within hours)
 
 ## 🙏 Recognition
 
