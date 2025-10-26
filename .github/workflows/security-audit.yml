@@ -72,13 +72,13 @@ jobs:
           output: "trivy-selfhosted-results.sarif"
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: "trivy-external-results.sarif"
 
       - name: Upload Trivy scan results (self-hosted)
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: "trivy-selfhosted-results.sarif"
