@@ -121,10 +121,19 @@ mypy .                     # Type checking
 
 ## 📚 Documentation
 
-- [Architecture Overview](docs/architecture.md)
-- [API Documentation](docs/api.md)
-- [Deployment Guide](docs/deployment.md)
-- [Migration Guide](docs/migration.md)
+For comprehensive documentation, visit our [GitHub Wiki](https://github.com/Wicz-Cloud/NextCraftTalk/wiki):
+
+### Quick Reference Guides
+- [NextCraftTalk Overview](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/NextCraftTalk-Overview) - Project description and features
+- [Nextcloud Talk Configuration](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Nextcloud-Talk-Configuration) - Setting up Nextcloud Talk and adding bots
+- [Ollama Setup Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Ollama-Setup-Guide) - Installing and configuring Ollama
+- [xAI API Usage](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/xAI-API-Usage) - Using xAI's Grok API
+- [Project Documentation](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Project-Documentation) - Full docs and development resources
+
+### External Resources
+- [Nextcloud Talk Official Documentation](https://docs.nextcloud.com/server/latest/user_manual/en/talk/index.html)
+- [Ollama Official Site](https://ollama.com/)
+- [xAI API Documentation](https://docs.x.ai/)
 
 ## 🤝 Contributing
 
