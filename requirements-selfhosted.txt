@@ -1,14 +1,14 @@
 # Core dependencies for Self-Hosted mode
 python-dotenv>=1.0.0
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
 fastapi>=0.104.0
 uvicorn>=0.24.0
 requests>=2.32.0
 python-multipart>=0.0.6
 
 # Logging and utilities
-loguru>=0.7.0
+loguru>=0.7.2
 watchdog>=3.0.0
 
 # Self-hosted specific dependencies
@@ -21,8 +21,8 @@ lxml>=4.9.0
 urllib3==2.5.0
 
 # Development dependencies (optional for production)
-pytest>=7.4.0
-black>=23.0.0
-flake8>=6.0.0
-mypy>=1.6.0
-pre-commit>=3.5.0
+pytest>=8.0.0
+black>=24.0.0
+flake8>=7.0.0
+mypy>=1.8.0
+pre-commit>=3.6.0
