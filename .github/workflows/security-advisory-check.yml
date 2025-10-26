@@ -38,6 +38,22 @@ jobs:
       - name: Create security reminder issue
         if: env.advisories_found == 'true'
         run: |
-          echo "Security advisories found - creating reminder issue"
-          # Note: Issue creation would require gh CLI authentication
-          # This is a placeholder for future implementation
+          # Check if an issue already exists to avoid duplicates
+          EXISTING_ISSUE=$(gh issue list --label "security,automated" --state open --json number,title --jq '.[] | select(.title | contains("Security Advisories Review")) | .number' || echo "")
+
+          if [ -z "$EXISTING_ISSUE" ]; then
+            echo "Creating new security advisory review issue..."
+
+            # Get advisory details for the issue body
+            ADVISORY_DETAILS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/security-advisories" | \
+              jq -r '.[] | select(.state == "published") | "- **\(.summary)** (GHSA-\(.ghsa_id)) - \(.severity)"' | head -5)
+
+            # Create the issue with a simple body
+            gh issue create \
+              --title "🔒 Security Advisories Review Required" \
+              --body "Security advisories detected in this repository. Please review them in the Security tab and update dependencies as needed." \
+              --label "security,automated,high-priority"
+          else
+            echo "Security advisory review issue already exists (#$EXISTING_ISSUE)"
+          fi
