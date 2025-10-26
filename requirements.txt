@@ -27,4 +27,4 @@ lxml>=4.9.0
 requests>=2.33.0
 
 # Force urllib3 update for security
-urllib3>=2.5.0
+urllib3==2.5.0

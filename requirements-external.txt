@@ -12,7 +12,7 @@ loguru>=0.7.0
 watchdog>=3.0.0
 
 # Force urllib3 update for security
-urllib3>=2.5.0
+urllib3==2.5.0
 
 # Development dependencies (optional for production)
 pytest>=7.4.0
