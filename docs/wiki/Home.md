@@ -18,3 +18,8 @@ Welcome to the NextCraftTalk project wiki! This wiki provides quick reference gu
 ## Getting Help
 - Join our [Discord community](https://discord.gg/D2vFfQW4Nm) for discussions and support
 - Check the [GitHub repository](https://github.com/Wicz-Cloud/NextCraftTalk) for issues and updates
+
+## External Resources
+- [Nextcloud Talk Official Documentation](https://docs.nextcloud.com/server/latest/user_manual/en/talk/index.html)
+- [Ollama Official Site](https://ollama.com/)
+- [xAI API Documentation](https://docs.x.ai/)
