@@ -7,6 +7,7 @@ on:
     tags:
       - "v*.*.*" # Triggers on version tags for testing
     branches:
+      - "main" # Trigger on main branch pushes
       - "test-discord-notifications" # Also trigger on test branch for debugging
 
 jobs:
