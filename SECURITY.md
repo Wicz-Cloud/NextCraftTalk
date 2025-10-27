@@ -44,10 +44,15 @@ We will keep you informed about our progress throughout the process of fixing th
 ### Code Security
 - **Automated Security Scanning**: We use CodeQL for static code analysis
 - **Dependency Monitoring**: Dependabot automatically updates dependencies and monitors for vulnerabilities
-- **Container Security**: Trivy scans Docker images for vulnerabilities
+- **Container Security**: Trivy scans Docker images for vulnerabilities with SARIF upload to GitHub Security tab
+- **Python Security Linting**: Bandit identifies common security issues in Python code
+- **Dependency Auditing**: Safety and pip-audit scan for known vulnerable packages
 - **Secret Detection**: TruffleHog prevents accidental secret exposure
 
 ### Infrastructure Security
+- **Secure Docker Images**: Alpine Linux base images for minimal attack surface
+- **Server Binding Security**: Default localhost-only bindings (127.0.0.1) instead of 0.0.0.0
+- **HTTP Timeout Protection**: Proper timeout handling prevents hanging connections
 - **Webhook Security**: All webhooks are verified using shared secrets
 - **Access Control**: Proper authentication and authorization mechanisms
 - **Regular Updates**: Dependencies and base images are kept up-to-date
@@ -108,5 +113,5 @@ This security policy applies to the NextCraftTalk project. For security issues i
 
 ---
 
-*Last updated: October 25, 2025*</content>
+*Last updated: October 26, 2025*</content>
 <parameter name="filePath">/home/bill/NextCraftTalk/SECURITY.md

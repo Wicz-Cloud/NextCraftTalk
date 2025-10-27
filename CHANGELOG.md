@@ -15,6 +15,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Repository structure modernized with professional Python standards
 
+## [1.0.2] - 2025-10-26
+
+### Security
+- **SARIF Upload Reliability**: Fixed JSON syntax errors in GitHub Actions security audit workflow
+- **Container Security Scanning**: Enhanced Trivy integration with automatic SARIF validation and fallback
+- **Vulnerability Mitigation**: Resolved urllib3 redirect vulnerabilities (CVE-2025-50181, CVE-2025-50182)
+- **Server Binding Security**: Changed default server bindings from 0.0.0.0 to 127.0.0.1 for localhost-only access
+
+### Fixed
+- **CI/CD Pipeline**: Resolved SARIF file generation failures preventing security results upload
+- **HTTP Timeouts**: Added proper timeout handling for Ollama API calls (30s tags, 300s model pulls)
+- **Security Scanning**: Fixed Bandit security linter issues and dependency vulnerability detection
+- **Workflow Reliability**: Enhanced error handling in security audit workflows with debug logging
+
+### Added
+- **Automated Security Validation**: jq-based SARIF file validation with minimal fallback structures
+- **Debug Logging**: Enhanced Trivy scan result inspection for troubleshooting
+- **Graceful Degradation**: Security workflows continue execution even with individual scan failures
+
 ## [1.0.0] - 2025-10-26
 
 ### Added

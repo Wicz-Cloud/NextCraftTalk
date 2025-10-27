@@ -185,6 +185,33 @@ NextCraftTalk follows [Semantic Versioning 2.0.0](https://semver.org/). For deta
 ### Release History
 See [CHANGELOG.md](CHANGELOG.md) for detailed release notes and version history.
 
+## 🔒 Security
+
+NextCraftTalk takes security seriously with comprehensive automated security scanning and best practices.
+
+### Security Features
+- **Automated Security Scanning**: Weekly security audits with multiple tools (Bandit, Safety, pip-audit, Trivy)
+- **Container Security**: Alpine Linux base images with Trivy vulnerability scanning
+- **Dependency Monitoring**: Automated dependency updates and vulnerability detection
+- **Secure Defaults**: Localhost-only server bindings by default
+- **SARIF Integration**: Security findings uploaded to GitHub Security tab
+
+### Security Scanning
+The project includes automated security scanning via GitHub Actions:
+- **Code Security**: Bandit static analysis for Python security issues
+- **Dependency Security**: Safety and pip-audit for vulnerable dependencies
+- **Container Security**: Trivy scans for Docker image vulnerabilities
+- **Weekly Audits**: Automated security scans every Monday
+
+### Security Best Practices
+- **Server Binding**: Default to `127.0.0.1` instead of `0.0.0.0` for local access only
+- **HTTP Timeouts**: Proper timeout handling for API calls (30s for tags, 300s for model pulls)
+- **Dependency Pinning**: Secure versions of dependencies with vulnerability fixes
+- **Container Hardening**: Non-root users and minimal attack surface
+
+### Reporting Security Issues
+Please report security vulnerabilities responsibly. See our [Security Policy](SECURITY.md) for details.
+
 ## 🤝 Contributing
 
 1. Fork the repository
