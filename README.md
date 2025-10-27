@@ -214,13 +214,31 @@ Please report security vulnerabilities responsibly. See our [Security Policy](SE
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+We welcome contributions from the community! Please see our [Contributing Guidelines](CONTRIBUTING.md) for detailed information on:
 
-## � Community
+- Development setup and workflow
+- Coding standards and best practices
+- Testing requirements
+- Pull request process
+- Issue reporting
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/NextCraftTalk.git`
+3. Set up development environment: `make install-all`
+4. Create a feature branch: `git checkout -b feature/your-feature`
+5. Make your changes following our [coding standards](CONTRIBUTING.md#coding-standards)
+6. Run tests: `make test`
+7. Submit a pull request
+
+## 📋 Community Standards
+
+- **[Code of Conduct](CODE_OF_CONDUCT.md)**: Our community guidelines and standards
+- **[Security Policy](SECURITY.md)**: How to report security vulnerabilities
+- **[License](LICENSE)**: MIT License terms and conditions
+
+## 🏷️ Versioning
 
 Join our Discord server for discussions, support, and to connect with other users: https://discord.gg/D2vFfQW4Nm
 

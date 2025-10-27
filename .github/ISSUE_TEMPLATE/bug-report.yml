@@ -1,0 +1,97 @@
+---
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[BUG] Brief description of the issue"
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide environment details
+      placeholder: |
+        - **OS**: [e.g., Ubuntu 22.04, macOS 12.0, Windows 11]
+        - **Python Version**: [e.g., 3.11.0]
+        - **NextCraftTalk Version**: [e.g., 1.0.2]
+        - **Deployment Mode**: [External AI / Self-hosted]
+        - **Docker Version**: [if applicable]
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem
+      placeholder: |
+        - **Configuration**: Any relevant configuration settings
+        - **Logs**: Error messages, stack traces, or log output
+        - **Reproduction Rate**: How often does this occur? (Always, Sometimes, Rarely)
+        - **Workarounds**: Any temporary workarounds you've found
+
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Security Impact
+      options:
+        - label: This bug involves sensitive information
+        - label: This bug could be exploited for malicious purposes
+        - label: This bug affects data security or privacy
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched for similar issues before creating this report
+          required: true
+        - label: I have included all relevant information
+          required: true
+        - label: I have tested with the latest version
+          required: true
+        - label: I have included steps to reproduce the issue
+          required: true

@@ -81,6 +81,29 @@ We actively maintain security updates for the following versions:
 - Report any suspicious activity
 - Follow security best practices in your deployment
 
+## 🔄 Security Updates and Disclosure
+
+### Security Update Process
+1. **Vulnerability Identified**: Security issues are identified through automated scanning or reports
+2. **Assessment**: Team evaluates impact, severity, and remediation options
+3. **Fix Development**: Security patches are developed and tested
+4. **Release**: Patches are released with appropriate version bumps
+5. **Communication**: Users are notified through release notes and security advisories
+
+### Responsible Disclosure
+We follow responsible disclosure practices:
+- **No Public Disclosure**: Please don't publicly disclose vulnerabilities until fixed
+- **Coordinated Release**: We work with reporters to ensure proper timing
+- **Credit**: Security researchers are credited for their findings
+- **Transparency**: We publish security advisories for all confirmed vulnerabilities
+
+### Security Advisory Process
+For confirmed security vulnerabilities:
+1. **Advisory Creation**: GitHub Security Advisory is created
+2. **CVE Assignment**: If applicable, we request CVE assignment
+3. **Fix Deployment**: Patches are deployed and tested
+4. **Public Notification**: Advisory is published with fix details
+
 ## 🏷️ Vulnerability Classification
 
 We use the following severity levels:
