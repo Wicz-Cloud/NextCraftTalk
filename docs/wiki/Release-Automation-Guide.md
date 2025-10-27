@@ -113,6 +113,34 @@ The automation handles the rest automatically.
 2. Check your Discord channel for the notification
 3. Verify the embed formatting and content
 
+### Testing Discord Notifications
+
+For testing Discord notifications without affecting main branch versioning:
+
+1. **Create Test Branch**:
+   ```bash
+   git checkout -b test-discord-notifications
+   ```
+
+2. **Create Test Tag**:
+   ```bash
+   ./scripts/version_manager.py bump --type patch
+   ./scripts/version_manager.py tag --message "test: Discord notification test"
+   ./scripts/version_manager.py push
+   ```
+
+3. **Check Discord**: Verify the notification appears in your channel
+
+4. **Clean Up**:
+   ```bash
+   git checkout main
+   git branch -D test-discord-notifications
+   git tag -d v1.x.x  # Delete test tag locally
+   git push origin :refs/tags/v1.x.x  # Delete test tag remotely
+   ```
+
+This approach keeps your main branch version history clean while allowing thorough testing of notification workflows.
+
 ### Discord Embed Features
 
 The automated Discord posts include:

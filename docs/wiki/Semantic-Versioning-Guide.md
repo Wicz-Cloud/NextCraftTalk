@@ -160,6 +160,18 @@ When you publish a release on GitHub, release notes are automatically posted as 
 
 The Discord workflow runs automatically on both GitHub releases and version tag pushes.
 
+### Testing Notifications
+
+To test Discord notifications without affecting main branch versioning:
+
+1. **Create Test Branch**: `git checkout -b test-discord-notifications`
+2. **Create Test Tag**: Use version manager to bump and tag
+3. **Push Tag**: Triggers Discord notification workflow
+4. **Verify**: Check Discord channel for notification
+5. **Clean Up**: Delete test branch and tags when done
+
+This keeps your main branch version history clean for testing.
+
 ## Branching Strategy
 
 - `main`: Production-ready code, tagged releases
