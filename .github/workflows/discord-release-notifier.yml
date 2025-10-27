@@ -5,12 +5,26 @@ on:
     types: [published] # Triggers on published releases
   push:
     tags:
-      - "v*.*.*" # Also triggers on version tags for testing
+      - "v*.*.*" # Triggers on version tags for testing
 
 jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Event Information
+        run: |
+          echo "🎯 Event Name: ${{ github.event_name }}"
+          echo "📝 Ref: ${{ github.ref }}"
+          echo "🏷️ Ref Name: ${{ github.ref_name }}"
+          echo "🔗 Repository: ${{ github.repository }}"
+          echo "👤 Actor: ${{ github.actor }}"
+          echo "📅 SHA: ${{ github.sha }}"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "📦 Release Name: ${{ github.event.release.name }}"
+            echo "🏷️ Release Tag: ${{ github.event.release.tag_name }}"
+            echo "📝 Release Body Length: $(echo '${{ github.event.release.body }}' | wc -c) chars"
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -19,49 +33,89 @@ jobs:
       - name: Get release info
         id: release_info
         run: |
+          echo "🔍 Processing event: ${{ github.event_name }}"
+
           if [ "${{ github.event_name }}" = "release" ]; then
-            echo "title=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
-            echo "body<<EOF" >> $GITHUB_OUTPUT
-            echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            echo "url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
-            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+            echo "📦 Processing GitHub release event"
+            TITLE="${{ github.event.release.name }}"
+            BODY="${{ github.event.release.body }}"
+            URL="${{ github.event.release.html_url }}"
+            TAG="${{ github.event.release.tag_name }}"
           else
-            # For tag pushes, create basic info
-            echo "title=Release ${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "body<<EOF" >> $GITHUB_OUTPUT
-            echo "New version ${{ github.ref_name }} has been tagged." >> $GITHUB_OUTPUT
-            echo "See CHANGELOG.md for detailed release notes." >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            echo "url=https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "🏷️ Processing tag push event"
+            TITLE="Release ${{ github.ref_name }}"
+            BODY="New version ${{ github.ref_name }} has been tagged.\n\nSee CHANGELOG.md for detailed release notes."
+            URL="https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
+            TAG="${{ github.ref_name }}"
           fi
 
-      - name: Send Discord notification
+          echo "📝 Title: $TITLE"
+          echo "🏷️ Tag: $TAG"
+          echo "📏 Body Length: $(echo '$BODY' | wc -c) chars"
+          echo "🔗 URL: $URL"
+
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Validate Discord Webhook Secret
         run: |
-          # Create JSON payload for Discord webhook
+          if [ -z "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+            echo "❌ ERROR: DISCORD_WEBHOOK_URL secret is not set!"
+            exit 1
+          else
+            echo "✅ Discord webhook secret is configured"
+            # Mask the URL for security but show it's set
+            WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+            echo "🔗 Webhook URL length: ${#WEBHOOK_URL} characters"
+            if [[ $WEBHOOK_URL == https://discord.com/api/webhooks/* ]]; then
+              echo "✅ Webhook URL format appears valid"
+            else
+              echo "⚠️ WARNING: Webhook URL format may be incorrect"
+            fi
+          fi
+
+      - name: Prepare Discord payload
+        id: prepare_payload
+        run: |
+          echo "🔨 Preparing Discord payload..."
+
+          # Escape JSON strings properly
+          TITLE_ESCAPED=$(echo "${{ steps.release_info.outputs.title }}" | sed 's/"/\\"/g')
+          BODY_ESCAPED=$(echo "${{ steps.release_info.outputs.body }}" | sed 's/"/\\"/g' | sed 's/$/\\n/g' | tr -d '\n')
+          URL_ESCAPED="${{ steps.release_info.outputs.url }}"
+          TAG_ESCAPED="${{ steps.release_info.outputs.tag }}"
+
           PAYLOAD=$(cat <<EOF
           {
             "content": "🚀 **New NextCraftTalk Release Available!**",
             "embeds": [{
-              "title": "${{ steps.release_info.outputs.title }}",
-              "description": "${{ steps.release_info.outputs.body }}",
-              "url": "${{ steps.release_info.outputs.url }}",
+              "title": "$TITLE_ESCAPED",
+              "description": "$BODY_ESCAPED",
+              "url": "$URL_ESCAPED",
               "color": 65280,
               "fields": [
                 {
                   "name": "Version",
-                  "value": "${{ steps.release_info.outputs.tag }}",
+                  "value": "$TAG_ESCAPED",
                   "inline": true
                 },
                 {
                   "name": "Repository",
                   "value": "[${{ github.repository }}](https://github.com/${{ github.repository }})",
                   "inline": true
+                },
+                {
+                  "name": "Branch",
+                  "value": "${{ github.ref_name }}",
+                  "inline": true
                 }
               ],
               "footer": {
-                "text": "NextCraftTalk • Released on $(date -u +'%Y-%m-%d %H:%M UTC')"
+                "text": "NextCraftTalk • Released on $(date -u +'%Y-%m-%d %H:%M UTC') • Event: ${{ github.event_name }}"
               },
               "thumbnail": {
                 "url": "https://raw.githubusercontent.com/Wicz-Cloud/NextCraftTalk/main/docs/assets/logo.png"
@@ -71,7 +125,36 @@ jobs:
           EOF
           )
 
-          # Send to Discord webhook
-          curl -H "Content-Type: application/json" \
+          echo "📦 Payload prepared successfully"
+          echo "📏 Payload size: $(echo "$PAYLOAD" | wc -c) characters"
+
+          # Save payload for next step
+          echo "$PAYLOAD" > /tmp/discord_payload.json
+          echo "💾 Payload saved to /tmp/discord_payload.json"
+
+      - name: Send Discord notification
+        run: |
+          echo "📤 Sending Discord notification..."
+
+          # Load the payload
+          PAYLOAD=$(cat /tmp/discord_payload.json)
+
+          echo "🔍 Payload preview (first 500 chars):"
+          echo "$PAYLOAD" | head -c 500
+          echo "..."
+
+          # Send to Discord webhook with verbose output
+          echo "🌐 Making HTTP request to Discord webhook..."
+          RESPONSE=$(curl -v -H "Content-Type: application/json" \
                -d "$PAYLOAD" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+               ${{ secrets.DISCORD_WEBHOOK_URL }} 2>&1)
+
+          # Check response
+          if echo "$RESPONSE" | grep -q "204 No Content\|200 OK"; then
+            echo "✅ Discord notification sent successfully!"
+          else
+            echo "❌ Failed to send Discord notification"
+            echo "🔍 Response details:"
+            echo "$RESPONSE"
+            exit 1
+          fi
