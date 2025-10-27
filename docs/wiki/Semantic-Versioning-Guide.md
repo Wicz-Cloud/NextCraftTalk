@@ -136,9 +136,9 @@ When you publish a release on GitHub, release notes are automatically posted as 
 
 1. **Create Discord Webhook**:
    - Open your Discord server settings
-   - Navigate to Integrations → Webhooks
+   - Navigate to **Integrations** → **Webhooks**
    - Create a new webhook for your releases channel
-   - Copy the webhook URL
+   - Copy the **Webhook URL**
 
 2. **Add GitHub Secret**:
    - Go to repository Settings → Secrets and variables → Actions
@@ -146,19 +146,19 @@ When you publish a release on GitHub, release notes are automatically posted as 
    - Paste your webhook URL as the value
 
 3. **Automatic Posting**:
-   - The workflow triggers on release publication
+   - Triggers on release publication OR version tag pushes
    - Posts formatted embeds with release title, notes, and links
    - Includes custom branding and footer messages
 
 #### Discord Embed Features
 
-- **Title**: Release name with link to GitHub release
+- **Title**: Release name with link to GitHub release/tag
 - **Description**: Full release notes with Markdown formatting
 - **Color**: Green theme for successful releases
 - **Footer**: Custom message with update notification
 - **Avatar**: NextCraftTalk branding
 
-The Discord workflow runs automatically and requires no manual intervention after setup.
+The Discord workflow runs automatically on both GitHub releases and version tag pushes.
 
 ## Branching Strategy
 

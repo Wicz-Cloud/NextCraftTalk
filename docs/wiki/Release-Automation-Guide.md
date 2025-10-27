@@ -119,9 +119,18 @@ The automated Discord posts include:
 
 - **Rich Embeds**: Formatted messages with titles, descriptions, and fields
 - **Release Information**: Title, tag, and direct links to GitHub
-- **Full Release Notes**: Complete changelog with Markdown formatting
+- **Full Release Notes**: Complete changelog with Markdown formatting (truncated to 2000 chars)
 - **Custom Branding**: NextCraftTalk colors and avatar
 - **Timestamps**: Automatic timestamp formatting
+- **Dual Triggers**: Works for both GitHub releases and version tags
+
+### Workflow Triggers
+
+The Discord notification workflow triggers on:
+- **Release Publication**: When you publish a release via GitHub's Releases page
+- **Version Tag Push**: When you push a tag matching `v*.*.*` (for testing and automated workflows)
+
+This dual-trigger system ensures notifications work whether you're using manual releases or automated tagging.
 
 ### Troubleshooting
 
