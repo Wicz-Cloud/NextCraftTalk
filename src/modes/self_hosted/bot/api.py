@@ -12,11 +12,7 @@ from pydantic import BaseModel
 from ..core.config import settings
 from ..xai.pipeline import DirectXAIPipeline
 from .message import clean_message
-from .nextcloud_api import (
-    delete_message,
-    send_thinking_message,
-    send_to_nextcloud_fallback,
-)
+from .nextcloud_api import delete_message, send_thinking_message, send_to_nextcloud_fallback
 from .security import verify_signature
 
 # Configure logging
@@ -27,9 +23,7 @@ logger = logging.getLogger(__name__)
 settings.ensure_log_directory()
 file_handler = logging.FileHandler(settings.log_path)
 file_handler.setLevel(getattr(logging, settings.log_level))
-file_formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
 
@@ -55,7 +49,7 @@ class NextcloudMessage(BaseModel):
     message_id: int | None = None
 
 
-@app.on_event("startup")  # type: ignore
+@app.on_event("startup")
 async def startup_event() -> None:
     """Initialize x.ai pipeline on startup
 
@@ -87,19 +81,18 @@ async def startup_event() -> None:
         raise
 
 
-@app.on_event("shutdown")  # type: ignore
+@app.on_event("shutdown")
 async def shutdown_event() -> None:
     """Cleanup on shutdown
 
     Stops file watcher and cleans up resources.
     """
-    global xai_pipeline
     if xai_pipeline:
         xai_pipeline.stop_file_watcher()
     logger.info("Bot shutdown complete")
 
 
-@app.get("/")  # type: ignore
+@app.get("/")
 async def root() -> dict:
     """Health check endpoint"""
     return {
@@ -109,13 +102,11 @@ async def root() -> dict:
     }
 
 
-@app.get("/health")  # type: ignore
+@app.get("/health")
 async def health() -> dict:
     """Detailed health check endpoint"""
     # Check if we have the required settings for x.ai
-    has_xai_config = bool(
-        settings.xai_api_key and settings.xai_api_key != "your-xai-api-key-here"
-    )
+    has_xai_config = bool(settings.xai_api_key and settings.xai_api_key != "your-xai-api-key-here")
 
     health_status = {
         "status": "healthy" if has_xai_config else "unhealthy",
@@ -128,13 +119,11 @@ async def health() -> dict:
     return health_status
 
 
-@app.get("/health")  # type: ignore
+@app.get("/health")
 async def health_check() -> dict:
     """Detailed health check"""
     # Check if we have the required settings for x.ai
-    has_xai_config = bool(
-        settings.xai_api_key and settings.xai_api_key != "your-xai-api-key-here"
-    )
+    has_xai_config = bool(settings.xai_api_key and settings.xai_api_key != "your-xai-api-key-here")
 
     health = {
         "status": "healthy" if has_xai_config else "unhealthy",
@@ -147,9 +136,7 @@ async def health_check() -> dict:
     return health
 
 
-async def process_and_respond(
-    token: str, query: str, thinking_message_id: int | None
-) -> None:
+async def process_and_respond(token: str, query: str, thinking_message_id: int | None) -> None:
     """
     Process the query and send response, then delete thinking message
 
@@ -164,11 +151,7 @@ async def process_and_respond(
             response = "Bot is not initialized yet."
         else:
             result = xai_pipeline.answer_question(query)
-            response = (
-                str(result["answer"])
-                if result and "answer" in result
-                else "I couldn't generate a response."
-            )
+            response = str(result["answer"]) if result and "answer" in result else "I couldn't generate a response."
 
         # Send the answer as a new message
         await send_to_nextcloud_fallback(token, response)
@@ -180,12 +163,10 @@ async def process_and_respond(
     except Exception as e:
         logger.error(f"Error in process_and_respond: {e}")
         # Send error message
-        await send_to_nextcloud_fallback(
-            token, "Sorry, I had trouble answering that. Try again!"
-        )
+        await send_to_nextcloud_fallback(token, "Sorry, I had trouble answering that. Try again!")
 
 
-@app.post("/webhook")  # type: ignore
+@app.post("/webhook")
 async def webhook_handler(request: Request, background_tasks: BackgroundTasks) -> dict:
     """
     Handle incoming webhooks from Nextcloud Talk
@@ -236,9 +217,7 @@ async def webhook_handler(request: Request, background_tasks: BackgroundTasks) -
             "minecraft_bot",
         ]:
             if settings.verbose_logging:
-                logger.info(
-                    f"Ignoring message from bot itself: {actor_name} ({actor_id})"
-                )
+                logger.info(f"Ignoring message from bot itself: {actor_name} ({actor_id})")
             return {"status": "ignored - bot message"}
 
         # Check if we should respond
@@ -263,7 +242,7 @@ async def webhook_handler(request: Request, background_tasks: BackgroundTasks) -
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@app.post("/test-query")  # type: ignore
+@app.post("/test-query")
 async def test_query(query: str) -> dict:
     """Test endpoint for debugging (no Nextcloud required)"""
     if settings.verbose_logging:
@@ -282,7 +261,7 @@ async def test_query(query: str) -> dict:
     return {"result": result, "source": "xai"}
 
 
-@app.get("/stats")  # type: ignore
+@app.get("/stats")
 async def get_stats() -> dict:
     """Get bot statistics"""
     stats = {}
@@ -293,7 +272,7 @@ async def get_stats() -> dict:
     return stats
 
 
-@app.post("/reload-prompt")  # type: ignore
+@app.post("/reload-prompt")
 async def reload_prompt() -> dict:
     """Manually reload the prompt template
 
@@ -308,9 +287,7 @@ async def reload_prompt() -> dict:
         xai_pipeline.reload_prompt_template()
         return {"status": "success", "message": "Prompt template reloaded"}
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to reload prompt: {str(e)}"
-        ) from e
+        raise HTTPException(status_code=500, detail=f"Failed to reload prompt: {str(e)}") from e
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ app = FastAPI(title="NextCraftTalk Self-Hosted")
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     """Initialize the self-hosted mode"""
     logger.info("🚀 Initializing NextCraftTalk Self-Hosted mode")
 
@@ -31,7 +31,7 @@ async def startup_event():
 
 
 @app.post("/webhook")
-async def nextcloud_webhook(request: Request):
+async def nextcloud_webhook(request: Request) -> dict:
     """
     Handle Nextcloud Talk webhooks with self-hosted AI
     """
@@ -64,7 +64,7 @@ async def nextcloud_webhook(request: Request):
 
 
 @app.get("/health")
-async def health_check():
+async def health_check() -> dict:
     """Health check endpoint"""
     try:
         # Test RAG pipeline
@@ -84,7 +84,7 @@ async def health_check():
 
 
 @app.post("/knowledge/add")
-async def add_knowledge(request: Request):
+async def add_knowledge(request: Request) -> dict:
     """Add new knowledge to the vector database"""
     try:
         data = await request.json()
@@ -104,7 +104,7 @@ async def add_knowledge(request: Request):
         raise HTTPException(status_code=500, detail="Failed to add knowledge")
 
 
-def run_self_hosted():
+def run_self_hosted() -> None:
     """Run the self-hosted mode application"""
     config = get_config()
 
@@ -113,9 +113,7 @@ def run_self_hosted():
     # Check if we have the required self-hosted configuration
     if not config.self_hosted:
         logger.error("Self-hosted mode requires DEPLOYMENT_MODE=self_hosted in .env")
-        logger.error(
-            "Please configure Ollama, ChromaDB, and other self-hosted settings"
-        )
+        logger.error("Please configure Ollama, ChromaDB, and other self-hosted settings")
         return
 
     logger.info("📚 Self-hosted AI stack components:")

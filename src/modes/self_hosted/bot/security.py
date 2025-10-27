@@ -11,9 +11,7 @@ from ..core.config import settings
 logger = logging.getLogger(__name__)
 
 
-def verify_signature(
-    raw_body: bytes, signature_header: str, random_header: str
-) -> bool:
+def verify_signature(raw_body: bytes, signature_header: str, random_header: str) -> bool:
     """
     Verify Nextcloud Talk webhook signature
 

@@ -36,10 +36,7 @@ def send_thinking_message(token: str) -> int | None:
     try:
         response = requests.post(base_url, headers=headers, json=data, timeout=10)
         if settings.verbose_logging:
-            logger.info(
-                f"Thinking message POST status: {response.status_code}, "
-                f"text: {response.text[:200]}"
-            )
+            logger.info(f"Thinking message POST status: {response.status_code}, " f"text: {response.text[:200]}")
         if response.status_code == 201:
             response_data = response.json()
             message_id = response_data.get("ocs", {}).get("data", {}).get("id")
@@ -47,10 +44,7 @@ def send_thinking_message(token: str) -> int | None:
                 logger.info(f"✓ Thinking message sent, ID: {message_id}")
             return int(message_id) if message_id is not None else None
         else:
-            logger.error(
-                f"Failed to send thinking message: {response.status_code} - "
-                f"{response.text}"
-            )
+            logger.error(f"Failed to send thinking message: {response.status_code} - " f"{response.text}")
             return None
     except Exception as e:
         logger.error(f"Error sending thinking message: {e}")
@@ -128,9 +122,7 @@ async def edit_message(token: str, message_id: int, new_message: str) -> bool:
                     logger.info(f"✓ Message updated in conversation {token}")
                 return True
             else:
-                logger.error(
-                    f"Failed to edit message: {response.status_code} - {response.text}"
-                )
+                logger.error(f"Failed to edit message: {response.status_code} - {response.text}")
                 return False
         except Exception as e:
             logger.error(f"Error editing message: {e}")
@@ -166,10 +158,7 @@ async def delete_message(token: str, message_id: int) -> bool:
                     logger.info(f"✓ Message deleted in conversation {token}")
                 return True
             else:
-                logger.error(
-                    f"Failed to delete message: {response.status_code} - "
-                    f"{response.text}"
-                )
+                logger.error(f"Failed to delete message: {response.status_code} - " f"{response.text}")
                 return False
         except Exception as e:
             logger.error(f"Error deleting message: {e}")

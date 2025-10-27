@@ -13,6 +13,7 @@ Welcome to the NextCraftTalk project wiki! This wiki provides quick reference gu
 - [xAI API Usage](xAI-API-Usage) - Using xAI's Grok API for AI responses
 
 ### Development
+- [Makefile Commands & Scenarios](Makefile-Commands-&-Scenarios) - Development workflow and deployment scenarios
 - [Project Documentation](Project-Documentation) - Links to full project docs and READMEs
 
 ## Getting Help

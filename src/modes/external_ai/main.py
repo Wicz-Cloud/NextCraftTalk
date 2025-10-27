@@ -12,7 +12,7 @@ from src.core.config import get_config
 from src.shared.utils import setup_logging
 
 
-def run_external_ai():
+def run_external_ai() -> None:
     """Run the external AI mode application"""
     config = get_config()
     setup_logging()

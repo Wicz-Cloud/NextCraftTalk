@@ -98,25 +98,62 @@ NextCraftTalk/
 
 ### Setup Development Environment
 ```bash
+# Install all dependencies (recommended)
+make install-all
+
+# Or install specific modes
+make install-external    # External AI mode only
+make install-selfhosted  # Self-hosted mode only
+make install-dev         # Development dependencies only
+```
+
+### Development Workflow
+```bash
+# Run all tests
+make test
+
+# Run tests with coverage
+make test-cov
+
+# Code quality checks
+make lint          # Run linting tools
+make format        # Format code
+make check         # Run all quality checks
+
+# Pre-commit hooks
+make pre-commit-install  # Install pre-commit hooks
+make pre-commit-run      # Run pre-commit on all files
+
+# Development server
+make serve-external     # Start external AI mode server
+make serve-selfhosted   # Start self-hosted mode server
+make stop               # Stop development server
+
+# Docker operations
+make docker-build-external    # Build external AI Docker image
+make docker-build-selfhosted  # Build self-hosted Docker image
+make docker-run-external      # Run external AI containers
+make docker-run-selfhosted    # Run self-hosted containers
+make docker-stop-external     # Stop external AI containers
+make docker-stop-selfhosted   # Stop self-hosted containers
+
+# Deployment
+make deploy-external     # Deploy external AI mode
+make deploy-selfhosted   # Deploy self-hosted mode
+
+# Cleanup
+make clean         # Clean temporary files
+make clean-all     # Clean everything including virtual env
+```
+
+### Manual Commands (Legacy)
+For manual setup without Makefile:
+```bash
 # For external AI mode
 pip install -r requirements-external.txt
 
 # For self-hosted mode
 pip install -r requirements-selfhosted.txt
-
-pre-commit install
-```
-
-### Running Tests
-```bash
-pytest
-```
-
-### Code Quality
-```bash
-black .                    # Format code
-flake8 .                   # Lint code
-mypy .                     # Type checking
 ```
 
 ## 📚 Documentation
@@ -125,6 +162,7 @@ For comprehensive documentation, visit our [GitHub Wiki](https://github.com/Wicz
 
 ### Quick Reference Guides
 - [NextCraftTalk Overview](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/NextCraftTalk-Overview) - Project description and features
+- [Makefile Commands & Scenarios](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Makefile-Commands-&-Scenarios) - Development workflow and deployment scenarios
 - [Nextcloud Talk Configuration](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Nextcloud-Talk-Configuration) - Setting up Nextcloud Talk and adding bots
 - [Ollama Setup Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Ollama-Setup-Guide) - Installing and configuring Ollama
 - [xAI API Usage](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/xAI-API-Usage) - Using xAI's Grok API

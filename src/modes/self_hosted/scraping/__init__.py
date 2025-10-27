@@ -2,12 +2,7 @@
 Web Scraping Module
 """
 
-from .wiki_scraper import (
-    ContentProcessor,
-    WikiScraper,
-    get_content_processor,
-    get_wiki_scraper,
-)
+from .wiki_scraper import ContentProcessor, WikiScraper, get_content_processor, get_wiki_scraper
 
 __all__ = [
     "WikiScraper",

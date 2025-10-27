@@ -201,7 +201,7 @@ deploy_python() {
     fi
 
     log_info "Starting NextCraftTalk with Python..."
-    python main.py
+    python src/main.py
 }
 
 # Stop deployment
@@ -229,7 +229,7 @@ show_status() {
     else
         log_info "Running in direct Python mode"
         # Check if process is running
-        if pgrep -f "python main.py" > /dev/null; then
+        if pgrep -f "python src/main.py" > /dev/null; then
             log_success "NextCraftTalk is running"
         else
             log_warning "NextCraftTalk is not running"

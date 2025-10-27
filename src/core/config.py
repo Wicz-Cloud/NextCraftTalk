@@ -19,10 +19,10 @@ class DeploymentMode(str, Enum):
 class NextcloudConfig(BaseSettings):
     """Nextcloud Talk configuration"""
 
-    url: str = Field(..., env="NEXTCLOUD_URL")
-    username: str = Field(..., env="NEXTCLOUD_USERNAME")
-    password: str = Field(..., env="NEXTCLOUD_PASSWORD")
-    room_token: str = Field(..., env="TALK_ROOM_TOKEN")
+    url: str = Field(env="NEXTCLOUD_URL")
+    username: str = Field(env="NEXTCLOUD_USERNAME")
+    password: str = Field(env="NEXTCLOUD_PASSWORD")
+    room_token: str = Field(env="TALK_ROOM_TOKEN")
 
     class Config:
         env_file = ".env"
@@ -32,7 +32,7 @@ class NextcloudConfig(BaseSettings):
 class ExternalAIConfig(BaseSettings):
     """External AI (x.ai) configuration"""
 
-    api_key: str = Field(..., env="XAI_API_KEY")
+    api_key: str = Field(env="XAI_API_KEY")
     base_url: str = Field(default="https://api.x.ai/v1", env="XAI_BASE_URL")
 
     class Config:
@@ -42,9 +42,7 @@ class ExternalAIConfig(BaseSettings):
 class SelfHostedConfig(BaseSettings):
     """Self-hosted AI configuration"""
 
-    ollama_base_url: str = Field(
-        default="http://localhost:11434", env="OLLAMA_BASE_URL"
-    )
+    ollama_base_url: str = Field(default="http://localhost:11434", env="OLLAMA_BASE_URL")
     ollama_model: str = Field(default="llama2", env="OLLAMA_MODEL")
     chroma_db_path: str = Field(default="./data/chroma_db", env="CHROMA_DB_PATH")
     chroma_db_host: str = Field(default="", env="CHROMA_DB_HOST")
@@ -80,23 +78,19 @@ class WebhookConfig(BaseSettings):
 class Config(BaseSettings):
     """Main configuration class"""
 
-    deployment_mode: DeploymentMode = Field(
-        default=DeploymentMode.EXTERNAL_AI, env="DEPLOYMENT_MODE"
-    )
+    deployment_mode: DeploymentMode = Field(default=DeploymentMode.EXTERNAL_AI, env="DEPLOYMENT_MODE")
 
-    # Nextcloud configuration
-    nextcloud_url: str = Field(..., env="NEXTCLOUD_URL")
-    nextcloud_username: str = Field(..., env="NEXTCLOUD_USERNAME")
-    nextcloud_password: str = Field(..., env="NEXTCLOUD_PASSWORD")
+    # Nextcloud configuration - make optional for testing
+    nextcloud_url: str = Field(default="https://example.com", env="NEXTCLOUD_URL")
+    nextcloud_username: str = Field(default="testuser", env="NEXTCLOUD_USERNAME")
+    nextcloud_password: str = Field(default="testpass", env="NEXTCLOUD_PASSWORD")
 
     # External AI configuration
     xai_api_key: str = Field(default="", env="XAI_API_KEY")
     xai_base_url: str = Field(default="https://api.x.ai/v1", env="XAI_BASE_URL")
 
     # Self-hosted configuration
-    ollama_base_url: str = Field(
-        default="http://localhost:11434", env="OLLAMA_BASE_URL"
-    )
+    ollama_base_url: str = Field(default="http://localhost:11434", env="OLLAMA_BASE_URL")
     ollama_model: str = Field(default="llama2", env="OLLAMA_MODEL")
     chroma_db_path: str = Field(default="./data/chroma_db", env="CHROMA_DB_PATH")
     chroma_db_host: str = Field(default="", env="CHROMA_DB_HOST")
@@ -115,6 +109,16 @@ class Config(BaseSettings):
 
     class Config:
         extra = "ignore"
+
+    @property
+    def self_hosted(self) -> bool:
+        """Check if running in self-hosted mode"""
+        return self.deployment_mode == DeploymentMode.SELF_HOSTED
+
+    @property
+    def external_ai(self) -> bool:
+        """Check if running in external AI mode"""
+        return self.deployment_mode == DeploymentMode.EXTERNAL_AI
 
 
 # Global config instance

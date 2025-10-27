@@ -40,9 +40,7 @@ class Settings(BaseSettings):
     # Nextcloud configuration
     nextcloud_url: str | None = None  # Nextcloud instance URL
     # (NEXTCLOUD_URL in .env)
-    nextcloud_bot_token: str | None = (
-        None  # Bot authentication token  # (NEXTCLOUD_BOT_TOKEN in .env)
-    )
+    nextcloud_bot_token: str | None = None  # Bot authentication token  # (NEXTCLOUD_BOT_TOKEN in .env)
 
     # Security
     shared_secret: str | None = None  # Webhook signature verification

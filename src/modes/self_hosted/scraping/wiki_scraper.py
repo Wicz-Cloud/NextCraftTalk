@@ -24,9 +24,7 @@ class WikiScraper:
         self.base_url = base_url.rstrip("/")
         self.delay = delay
         self.session = requests.Session()
-        self.session.headers.update(
-            {"User-Agent": "NextCraftTalk/1.0 (Knowledge Base Builder)"}
-        )
+        self.session.headers.update({"User-Agent": "NextCraftTalk/1.0 (Knowledge Base Builder)"})
 
     def scrape_page(self, url: str) -> Optional[Dict[str, Any]]:
         """Scrape a single page and extract content"""
@@ -54,9 +52,7 @@ class WikiScraper:
 
             if not content:
                 # Fallback to body text
-                content = (
-                    soup.body.get_text(separator="\n", strip=True) if soup.body else ""
-                )
+                content = soup.body.get_text(separator="\n", strip=True) if soup.body else ""
 
             return {
                 "url": url,
@@ -69,11 +65,9 @@ class WikiScraper:
             logger.error(f"Error scraping {url}: {e}")
             return None
 
-    def scrape_wiki_pages(
-        self, start_url: str, max_pages: int = 50
-    ) -> List[Dict[str, Any]]:
+    def scrape_wiki_pages(self, start_url: str, max_pages: int = 50) -> List[Dict[str, Any]]:
         """Scrape multiple wiki pages starting from a given URL"""
-        scraped_pages = []
+        scraped_pages: List[Dict[str, Any]] = []
         visited_urls = set()
         urls_to_visit = [start_url]
 
@@ -99,18 +93,13 @@ class WikiScraper:
                         href = link["href"]
                         if href.startswith("/"):  # Relative link
                             full_url = urljoin(self.base_url, href)
-                        elif href.startswith(
-                            self.base_url
-                        ):  # Absolute link on same domain
+                        elif href.startswith(self.base_url):  # Absolute link on same domain
                             full_url = href
                         else:
                             continue
 
                         # Only follow links within the wiki
-                        if (
-                            full_url.startswith(self.base_url)
-                            and full_url not in visited_urls
-                        ):
+                        if full_url.startswith(self.base_url) and full_url not in visited_urls:
                             urls_to_visit.append(full_url)
 
                 except Exception as e:
@@ -118,7 +107,7 @@ class WikiScraper:
 
         return scraped_pages
 
-    def save_to_json(self, pages: List[Dict[str, Any]], output_path: str):
+    def save_to_json(self, pages: List[Dict[str, Any]], output_path: str) -> None:
         """Save scraped pages to JSON file"""
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -132,12 +121,10 @@ class WikiScraper:
 class ContentProcessor:
     """Process scraped content for vector database ingestion"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def chunk_text(
-        self, text: str, chunk_size: int = 1000, overlap: int = 200
-    ) -> List[str]:
+    def chunk_text(self, text: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
         """Split text into overlapping chunks for better retrieval"""
         chunks = []
         start = 0
@@ -158,9 +145,7 @@ class ContentProcessor:
 
         return chunks
 
-    def process_scraped_pages(
-        self, pages: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def process_scraped_pages(self, pages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Process scraped pages into chunks with metadata"""
         processed_chunks = []
 

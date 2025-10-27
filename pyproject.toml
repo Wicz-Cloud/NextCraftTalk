@@ -1,0 +1,217 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nextcrafttalk"
+version = "0.1.0"
+description = "Unified AI Chatbot for Nextcloud Talk with dual deployment modes"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Wicz-Cloud", email = "contact@wicz.cloud"},
+]
+maintainers = [
+    {name = "Wicz-Cloud", email = "contact@wicz.cloud"},
+]
+keywords = ["nextcloud", "talk", "chatbot", "ai", "ollama", "rag", "fastapi"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Communications :: Chat",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "requests>=2.32.0",
+    "python-multipart>=0.0.6",
+    "loguru>=0.7.2",
+    "watchdog>=3.0.0",
+    "urllib3==2.5.0",
+]
+
+[project.optional-dependencies]
+external-ai = [
+    # External AI mode dependencies (already included in main dependencies)
+]
+
+self-hosted = [
+    "chromadb==1.2.1",
+    "sentence-transformers==5.1.2",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+]
+
+dev = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+    "isort>=5.13.2",
+]
+
+docs = [
+    "sphinx>=5.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+]
+
+all = [
+    "nextcrafttalk[dev]",
+    "nextcrafttalk[self-hosted]",
+    "nextcrafttalk[docs]",
+]
+
+[project.urls]
+Homepage = "https://github.com/Wicz-Cloud/NextCraftTalk"
+Repository = "https://github.com/Wicz-Cloud/NextCraftTalk"
+Documentation = "https://github.com/Wicz-Cloud/NextCraftTalk/wiki"
+Issues = "https://github.com/Wicz-Cloud/NextCraftTalk/issues"
+Changelog = "https://github.com/Wicz-Cloud/NextCraftTalk/releases"
+
+[project.scripts]
+nextcrafttalk = "nextcrafttalk.main:main"
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+nextcrafttalk = ["prompt_template.txt"]
+
+# Black configuration
+[tool.black]
+line-length = 120
+target-version = ['py311', 'py312', 'py313']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+known_first_party = ["nextcrafttalk"]
+
+# Flake8 configuration
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".venv",
+    "venv",
+    "test_venv",
+    ".tox",
+    ".mypy_cache",
+]
+per-file-ignores = [
+    "__init__.py:F401",
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+no_implicit_optional = false
+warn_redundant_casts = false
+warn_unused_ignores = true
+warn_no_return = false
+warn_unreachable = false
+strict_equality = false
+show_error_codes = true
+disable_error_code = ["call-overload", "misc", "attr-defined", "arg-type", "assignment", "no-any-return", "union-attr", "type-var", "var-annotated", "return-value"]
+
+[[tool.mypy.overrides]]
+module = [
+    "chromadb.*",
+    "sentence_transformers.*",
+    "ollama.*",
+    "core.*",
+    "shared.*",
+    "modes.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+    "external: Tests requiring external services",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "test_venv/*",
+    "venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Bandit security linting
+[tool.bandit]
+exclude_dirs = ["test_venv", "venv", ".venv", "tests"]
+skips = ["B101", "B601"]  # Skip assert checks and shell usage warnings

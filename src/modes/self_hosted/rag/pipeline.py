@@ -60,25 +60,17 @@ Answer:"""
             logger.error(f"Error retrieving context: {e}")
             return []
 
-    def generate_rag_response(
-        self, query: str, context_docs: List[str]
-    ) -> Optional[str]:
+    def generate_rag_response(self, query: str, context_docs: List[str]) -> Optional[str]:
         """Generate response using retrieved context"""
         try:
             # Combine context documents
-            context = (
-                "\n\n".join(context_docs)
-                if context_docs
-                else "No relevant context found."
-            )
+            context = "\n\n".join(context_docs) if context_docs else "No relevant context found."
 
             # Format prompt
             prompt = self.rag_prompt_template.format(context=context, question=query)
 
             # Generate response with Ollama
-            response = self.ollama_client.generate(
-                prompt=prompt, temperature=0.7, top_p=0.9
-            )
+            response = self.ollama_client.generate(prompt=prompt, temperature=0.7, top_p=0.9)
 
             return response
 
@@ -100,11 +92,9 @@ Answer:"""
         logger.info("Using direct LLM generation (no RAG context)")
         response = self.ollama_client.generate(prompt=question, temperature=0.7)
 
-        return (
-            response or "I apologize, but I couldn't generate a response at this time."
-        )
+        return response or "I apologize, but I couldn't generate a response at this time."
 
-    def add_knowledge(self, text: str, metadata: Optional[Dict[str, Any]] = None):
+    def add_knowledge(self, text: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         """Add new knowledge to the vector database"""
         try:
             self.vector_db.add_texts([text], metadatas=[metadata] if metadata else None)

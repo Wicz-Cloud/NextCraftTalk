@@ -1,6 +1,6 @@
 # NextCraftTalk External AI Mode Dockerfile
 
-FROM python:3.14-slim
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
@@ -18,7 +18,6 @@ RUN pip install --no-cache-dir -r requirements-external.txt
 
 # Copy source code
 COPY src/ ./src/
-COPY main.py .
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app \
@@ -34,4 +33,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Run the application
 ENV PYTHONPATH=/app
-CMD ["python", "main.py"]
+CMD ["python", "src/main.py"]

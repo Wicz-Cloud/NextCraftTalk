@@ -14,7 +14,7 @@ from src.core.config import get_config
 class Settings:
     """Compatibility wrapper for NextCraftTalk-EXT settings"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._config = get_config()
 
     @property

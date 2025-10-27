@@ -8,24 +8,16 @@ Unified entry point that loads the appropriate mode based on configuration.
 import sys
 from pathlib import Path
 
-# Add src to path for imports
-src_path = str(Path(__file__).parent / "src")
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
+# Add current directory (src) to path for imports when run from project root
+current_path = str(Path(__file__).parent)
+if current_path not in sys.path:
+    sys.path.insert(0, current_path)
 
-from src.core.config import (  # noqa: E402
-    get_config,
-    is_external_ai_mode,
-    is_self_hosted_mode,
-)
-from src.shared.utils import (  # noqa: E402
-    ensure_directories,
-    load_env_file,
-    setup_logging,
-)
+from core.config import get_config, is_external_ai_mode, is_self_hosted_mode  # noqa: E402
+from shared.utils import ensure_directories, load_env_file, setup_logging  # noqa: E402
 
 
-def main():
+def main() -> None:
     """Main application entry point"""
     # Load environment and setup
     load_env_file()
@@ -38,11 +30,11 @@ def main():
 
     # Import and run appropriate mode
     if is_external_ai_mode():
-        from src.modes.external_ai.main import run_external_ai
+        from modes.external_ai.main import run_external_ai
 
         run_external_ai()
     elif is_self_hosted_mode():
-        from src.modes.self_hosted.main import run_self_hosted
+        from modes.self_hosted.main import run_self_hosted
 
         run_self_hosted()
     else:

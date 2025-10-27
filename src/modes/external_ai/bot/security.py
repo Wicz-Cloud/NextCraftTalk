@@ -13,9 +13,7 @@ config = get_config()
 logger = logging.getLogger(__name__)
 
 
-def verify_signature(
-    raw_body: bytes, signature_header: str, random_header: str
-) -> bool:
+def verify_signature(raw_body: bytes, signature_header: str, random_header: str) -> bool:
     """
     Verify Nextcloud Talk webhook signature
 
@@ -43,9 +41,7 @@ def verify_signature(
         message_to_sign = random_header.encode("utf-8") + raw_body
 
         # Create HMAC-SHA256 signature
-        expected_signature = hmac.new(
-            config.shared_secret.encode("utf-8"), message_to_sign, hashlib.sha256
-        ).hexdigest()
+        expected_signature = hmac.new(config.shared_secret.encode("utf-8"), message_to_sign, hashlib.sha256).hexdigest()
 
         provided_signature = signature_header.lower().strip()
 

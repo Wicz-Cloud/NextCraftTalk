@@ -17,9 +17,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Enable verbose logging (shows full messages and responses)",
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="Enable debug logging level"
-    )
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging level")
 
     args = parser.parse_args()
 
