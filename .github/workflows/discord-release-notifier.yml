@@ -2,19 +2,76 @@ name: Notify Discord on Release
 
 on:
   release:
-    types: [published] # Triggers only on new published releases
+    types: [published] # Triggers on published releases
+  push:
+    tags:
+      - "v*.*.*" # Also triggers on version tags for testing
 
 jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Release to Discord
-        uses: SethCohen/github-releases-to-discord@v1.4.0 # Popular Action for formatted embeds
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # Optional customizations:
-          color: "00ff00" # Embed color (hex, e.g., green for success)
-          username: "NextCraftTalk Releases" # Display name for the post
-          avatar_url: "https://raw.githubusercontent.com/Wicz-Cloud/NextCraftTalk/main/docs/assets/logo.png" # Repo logo if available
-          footer_text: "🚀 New NextCraftTalk update available!"
-          max_description_length: 2000 # Trim long notes (Discord limit: 4096 chars)
+          fetch-depth: 0
+
+      - name: Get release info
+        id: release_info
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "title=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            # For tag pushes, create basic info
+            echo "title=Release ${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            echo "New version ${{ github.ref_name }} has been tagged." >> $GITHUB_OUTPUT
+            echo "See CHANGELOG.md for detailed release notes." >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "url=https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Discord notification
+        run: |
+          # Create JSON payload for Discord webhook
+          PAYLOAD=$(cat <<EOF
+          {
+            "content": "🚀 **New NextCraftTalk Release Available!**",
+            "embeds": [{
+              "title": "${{ steps.release_info.outputs.title }}",
+              "description": "${{ steps.release_info.outputs.body }}",
+              "url": "${{ steps.release_info.outputs.url }}",
+              "color": 65280,
+              "fields": [
+                {
+                  "name": "Version",
+                  "value": "${{ steps.release_info.outputs.tag }}",
+                  "inline": true
+                },
+                {
+                  "name": "Repository",
+                  "value": "[${{ github.repository }}](https://github.com/${{ github.repository }})",
+                  "inline": true
+                }
+              ],
+              "footer": {
+                "text": "NextCraftTalk • Released on $(date -u +'%Y-%m-%d %H:%M UTC')"
+              },
+              "thumbnail": {
+                "url": "https://raw.githubusercontent.com/Wicz-Cloud/NextCraftTalk/main/docs/assets/logo.png"
+              }
+            }]
+          }
+          EOF
+          )
+
+          # Send to Discord webhook
+          curl -H "Content-Type: application/json" \
+               -d "$PAYLOAD" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
