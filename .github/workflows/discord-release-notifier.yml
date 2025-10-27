@@ -63,6 +63,69 @@ jobs:
           echo "url=$URL" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
+      - name: Extract changelog for version
+        id: changelog_info
+        run: |
+          echo "📋 Extracting changelog information for version $TAG"
+
+          # Extract changelog section for this version
+          CHANGELOG_CONTENT=""
+          if [ -f "CHANGELOG.md" ]; then
+            # Find the section for this version in CHANGELOG.md
+            # Look for pattern like "## [1.0.3] - 2025-10-26" or "## [1.0.3]"
+            VERSION_PATTERN="## \\[$TAG\\]"
+            if grep -q "$VERSION_PATTERN" CHANGELOG.md; then
+              echo "✅ Found changelog section for version $TAG"
+              # Extract everything from this version header until the next version header or end
+              CHANGELOG_CONTENT=$(awk "/$VERSION_PATTERN/,/^## \\[.*\\]/{if(/^## \\[.*\\]/{if(found){exit}else{found=1;next}} if(found) print}" CHANGELOG.md | sed '/^$/d' | head -20)
+              if [ -z "$CHANGELOG_CONTENT" ]; then
+                CHANGELOG_CONTENT=$(awk "/$VERSION_PATTERN/{found=1; next} /^## \\[/{if(found) exit} found && !/^$/{print}" CHANGELOG.md | head -20)
+              fi
+            else
+              echo "⚠️ No changelog section found for version $TAG"
+              CHANGELOG_CONTENT="No changelog entries found for this version."
+            fi
+          else
+            echo "⚠️ CHANGELOG.md file not found"
+            CHANGELOG_CONTENT="Changelog file not available."
+          fi
+
+          echo "📝 Changelog content length: $(echo "$CHANGELOG_CONTENT" | wc -c) chars"
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Get commit messages since last tag
+        id: commit_info
+        run: |
+          echo "🔄 Getting commit messages for version $TAG"
+
+          # Get the previous tag to compare against
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+
+          if [ -n "$PREV_TAG" ]; then
+            echo "📊 Comparing $PREV_TAG..$TAG"
+            # Get commit messages between tags
+            COMMITS=$(git log --oneline --pretty=format:"- %s" $PREV_TAG..$TAG 2>/dev/null | head -10)
+            if [ -z "$COMMITS" ]; then
+              COMMITS=$(git log --oneline --pretty=format:"- %s" -10 2>/dev/null)
+            fi
+          else
+            echo "📊 Getting recent commits (no previous tag found)"
+            # If no previous tag, get last 10 commits
+            COMMITS=$(git log --oneline --pretty=format:"- %s" -10 2>/dev/null)
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            COMMITS="No recent commits found."
+          fi
+
+          echo "📝 Commit messages:"
+          echo "$COMMITS"
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Validate Discord Webhook Secret
         run: |
           if [ -z "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
@@ -91,6 +154,10 @@ jobs:
           URL_ESCAPED="${{ steps.release_info.outputs.url }}"
           TAG_ESCAPED="${{ steps.release_info.outputs.tag }}"
 
+          # Escape changelog and commit information
+          CHANGELOG_ESCAPED=$(echo "${{ steps.changelog_info.outputs.changelog }}" | sed 's/"/\\"/g' | sed 's/$/\\n/g' | tr -d '\n' | head -c 500)
+          COMMITS_ESCAPED=$(echo "${{ steps.commit_info.outputs.commits }}" | sed 's/"/\\"/g' | sed 's/$/\\n/g' | tr -d '\n' | head -c 500)
+
           PAYLOAD=$(cat <<EOF
           {
             "content": "🚀 **New NextCraftTalk Release Available!**",
@@ -114,6 +181,16 @@ jobs:
                   "name": "Branch",
                   "value": "${{ github.ref_name }}",
                   "inline": true
+                },
+                {
+                  "name": "📋 Changelog",
+                  "value": "$CHANGELOG_ESCAPED",
+                  "inline": false
+                },
+                {
+                  "name": "🔄 Recent Commits",
+                  "value": "$COMMITS_ESCAPED",
+                  "inline": false
                 }
               ],
               "footer": {
