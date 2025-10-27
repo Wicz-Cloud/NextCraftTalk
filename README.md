@@ -180,7 +180,7 @@ For comprehensive documentation, visit our [GitHub Wiki](https://github.com/Wicz
 NextCraftTalk follows [Semantic Versioning 2.0.0](https://semver.org/). For details on our versioning strategy and release process, see our [Semantic Versioning Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Semantic-Versioning-Guide).
 
 ### Current Version
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Wicz-Cloud/NextCraftTalk/releases)
+[![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)](https://github.com/Wicz-Cloud/NextCraftTalk/releases)
 
 ### Release History
 See [CHANGELOG.md](CHANGELOG.md) for detailed release notes and version history.
