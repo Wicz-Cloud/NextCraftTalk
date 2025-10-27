@@ -31,7 +31,7 @@ class WikiScraper:
         try:
             time.sleep(self.delay)  # Be respectful to servers
 
-            response = self.session.get(url, timeout=30)
+            response = self.session.get(url, timeout=30, allow_redirects=False)
             response.raise_for_status()
 
             soup = BeautifulSoup(response.content, "html.parser")

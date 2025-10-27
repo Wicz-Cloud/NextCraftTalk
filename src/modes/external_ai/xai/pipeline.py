@@ -150,6 +150,7 @@ ANSWER:
                 headers=headers,
                 json=payload,
                 timeout=10,
+                allow_redirects=False,  # Security: Prevent SSRF via redirects
             )
             if response.status_code == 200:
                 logger.info(f"✓ Connected to x.ai API. Using model: {self.model_name}")
@@ -242,6 +243,7 @@ ANSWER:
                 headers=headers,
                 json=payload,
                 timeout=60,
+                allow_redirects=False,  # Security: Prevent SSRF via redirects
             )
             if response.status_code == 200:
                 data = response.json()
