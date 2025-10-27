@@ -68,7 +68,7 @@ class WebhookConfig(BaseSettings):
     """Webhook configuration"""
 
     port: int = Field(default=8080, env="WEBHOOK_PORT")
-    host: str = Field(default="0.0.0.0", env="WEBHOOK_HOST")
+    host: str = Field(default="127.0.0.1", env="WEBHOOK_HOST")  # Default to localhost for security
     shared_secret: Optional[str] = Field(default=None, env="SHARED_SECRET")
 
     class Config:
@@ -102,9 +102,13 @@ class Config(BaseSettings):
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     log_file: str = Field(default="logs/nextcraft.log", env="LOG_FILE")
 
+    # Bot server configuration
+    bot_port: int = Field(default=8111, env="BOT_PORT")
+    bot_host: str = Field(default="127.0.0.1", env="BOT_HOST")  # Default to localhost for security
+
     # Webhook configuration
     webhook_port: int = Field(default=8080, env="WEBHOOK_PORT")
-    webhook_host: str = Field(default="0.0.0.0", env="WEBHOOK_HOST")
+    webhook_host: str = Field(default="127.0.0.1", env="WEBHOOK_HOST")  # Default to localhost for security
     shared_secret: Optional[str] = Field(default=None, env="SHARED_SECRET")
 
     class Config:

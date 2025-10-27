@@ -25,7 +25,7 @@ class OllamaClient:
     def _ensure_model_available(self) -> None:
         """Ensure the specified model is available in Ollama"""
         try:
-            response = requests.get(f"{self.base_url}/api/tags")
+            response = requests.get(f"{self.base_url}/api/tags", timeout=30)
             if response.status_code == 200:
                 models = response.json().get("models", [])
                 model_names = [m["name"] for m in models]
@@ -43,7 +43,7 @@ class OllamaClient:
     def pull_model(self, model_name: str) -> bool:
         """Pull a model from the Ollama library"""
         try:
-            response = requests.post(f"{self.base_url}/api/pull", json={"name": model_name})
+            response = requests.post(f"{self.base_url}/api/pull", json={"name": model_name}, timeout=300)
             return response.status_code == 200
         except Exception as e:
             logger.error(f"Error pulling model {model_name}: {e}")

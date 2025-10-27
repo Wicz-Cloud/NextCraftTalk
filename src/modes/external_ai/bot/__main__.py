@@ -34,4 +34,4 @@ if __name__ == "__main__":
     # Configure logging
     logging.basicConfig(level=getattr(logging, settings.log_level))
 
-    uvicorn.run("src.bot.api:app", host="0.0.0.0", port=settings.bot_port, reload=False)
+    uvicorn.run("src.bot.api:app", host=settings.bot_host, port=settings.bot_port, reload=False)
