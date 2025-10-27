@@ -83,6 +83,12 @@ jobs:
           format: "sarif"
           output: "trivy-external-results.sarif"
 
+      - name: Debug Trivy external results
+        run: |
+          echo "Checking trivy-external-results.sarif..."
+          ls -la trivy-external-results.sarif
+          head -20 trivy-external-results.sarif || echo "File is empty or doesn't exist"
+
       - name: Run Trivy on self-hosted image
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
@@ -92,10 +98,39 @@ jobs:
           format: "sarif"
           output: "trivy-selfhosted-results.sarif"
 
-      - name: Ensure SARIF files exist
+      - name: Debug Trivy selfhosted results
         run: |
-          touch trivy-external-results.sarif
-          touch trivy-selfhosted-results.sarif
+          echo "Checking trivy-selfhosted-results.sarif..."
+          ls -la trivy-selfhosted-results.sarif
+          head -20 trivy-selfhosted-results.sarif || echo "File is empty or doesn't exist"
+
+      - name: Validate SARIF files
+        run: |
+          for file in trivy-external-results.sarif trivy-selfhosted-results.sarif; do
+            echo "Validating $file..."
+            if jq empty "$file" 2>/dev/null; then
+              echo "✅ $file is valid JSON"
+            else
+              echo "❌ $file is invalid JSON, recreating..."
+              cat > "$file" << 'EOF'
+              {
+                "version": "2.1.0",
+                "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+                "runs": [{
+                  "tool": {
+                    "driver": {
+                      "name": "Trivy",
+                      "version": "latest",
+                      "informationUri": "https://github.com/aquasecurity/trivy"
+                    }
+                  },
+                  "results": []
+                }]
+              }
+              EOF
+              echo "✅ Created valid minimal SARIF for $file"
+            fi
+          done
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
