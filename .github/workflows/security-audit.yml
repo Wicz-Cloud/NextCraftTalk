@@ -29,6 +29,12 @@ jobs:
           pip install -r requirements-external.txt
           pip install -r requirements-selfhosted.txt
 
+      - name: Run pip-audit for dependency vulnerabilities
+        run: |
+          pip install pip-audit
+          pip-audit --format json --output pip-audit-report.json || true
+          cat pip-audit-report.json
+
       - name: Run safety check
         run: |
           pip install safety
@@ -39,6 +45,13 @@ jobs:
           pip install bandit
           bandit -r src/ -f json -o bandit-report.json || true
           cat bandit-report.json
+
+      - name: Upload pip-audit results
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: pip-audit-report
+          path: pip-audit-report.json
 
       - name: Upload bandit results
         uses: actions/upload-artifact@v5

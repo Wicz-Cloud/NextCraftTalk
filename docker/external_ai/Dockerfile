@@ -1,14 +1,14 @@
 # NextCraftTalk External AI Mode Dockerfile
 
-FROM python:3.11-slim
+FROM python:3.11-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/cache/apk/*
 
 # Copy requirements first for better caching
 COPY requirements-external.txt .
@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements-external.txt
 COPY src/ ./src/
 
 # Create non-root user
-RUN useradd --create-home --shell /bin/bash app \
+RUN adduser -D -h /home/app -s /bin/sh app \
     && chown -R app:app /app
 USER app
 

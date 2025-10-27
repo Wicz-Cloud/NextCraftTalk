@@ -1,4 +1,5 @@
-# Core dependencies for External AI mode
+# Core dependencies
+pip>=24.0  # Security: Ensure pip has symbolic link extraction checks for External AI mode
 python-dotenv>=1.0.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
