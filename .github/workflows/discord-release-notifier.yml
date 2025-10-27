@@ -152,7 +152,7 @@ jobs:
                ${{ secrets.DISCORD_WEBHOOK_URL }} 2>&1)
 
           # Check response
-          if echo "$RESPONSE" | grep -q "204 No Content\|200 OK"; then
+          if echo "$RESPONSE" | grep -q "< HTTP/2 204\|204 No Content\|200 OK"; then
             echo "✅ Discord notification sent successfully!"
           else
             echo "❌ Failed to send Discord notification"
