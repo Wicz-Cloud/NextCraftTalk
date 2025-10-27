@@ -1,7 +1,7 @@
 # NextCraftTalk Development Makefile
 # Provides common development tasks and shortcuts
 
-.PHONY: help install install-dev install-all test lint format check clean docker-build docker-run docker-stop docs serve stop
+.PHONY: help install install-dev install-all test lint format check clean docker-build docker-run docker-stop docs serve stop version version-bump-patch version-bump-minor version-bump-major version-tag version-push version-release version-changelog
 
 # Default target
 help: ## Show this help message
@@ -119,6 +119,35 @@ deps-update: ## Update dependencies
 	pip-compile --upgrade
 	pip-compile --upgrade requirements-external.in
 	pip-compile --upgrade requirements-selfhosted.in
+
+# Version management targets
+version: ## Show current version
+	./scripts/version_manager.py current
+
+version-bump-patch: ## Bump patch version (x.x.Z)
+	./scripts/version_manager.py bump --type patch
+
+version-bump-minor: ## Bump minor version (x.Y.0)
+	./scripts/version_manager.py bump --type minor
+
+version-bump-major: ## Bump major version (X.0.0)
+	./scripts/version_manager.py bump --type major
+
+version-tag: ## Create git tag for current version
+	./scripts/version_manager.py tag
+
+version-push: ## Push current version tag to remote
+	./scripts/version_manager.py push
+
+version-release: ## Create and push a new release (patch)
+	$(MAKE) check
+	$(MAKE) test
+	$(MAKE) version-bump-patch
+	$(MAKE) version-tag
+	$(MAKE) version-push
+
+version-changelog: ## Show recent commits for changelog
+	./scripts/version_manager.py changelog
 
 # Pre-commit hooks
 pre-commit-install: ## Install pre-commit hooks

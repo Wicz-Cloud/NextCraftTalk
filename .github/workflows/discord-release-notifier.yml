@@ -1,0 +1,20 @@
+name: Notify Discord on Release
+
+on:
+  release:
+    types: [published] # Triggers only on new published releases
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Release to Discord
+        uses: SethCohen/github-releases-to-discord@v1.4.0 # Popular Action for formatted embeds
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # Optional customizations:
+          color: "00ff00" # Embed color (hex, e.g., green for success)
+          username: "NextCraftTalk Releases" # Display name for the post
+          avatar_url: "https://raw.githubusercontent.com/Wicz-Cloud/NextCraftTalk/main/docs/assets/logo.png" # Repo logo if available
+          footer_text: "🚀 New NextCraftTalk update available!"
+          max_description_length: 2000 # Trim long notes (Discord limit: 4096 chars)

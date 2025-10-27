@@ -167,11 +167,23 @@ For comprehensive documentation, visit our [GitHub Wiki](https://github.com/Wicz
 - [Ollama Setup Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Ollama-Setup-Guide) - Installing and configuring Ollama
 - [xAI API Usage](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/xAI-API-Usage) - Using xAI's Grok API
 - [Project Documentation](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Project-Documentation) - Full docs and development resources
+- **[Semantic Versioning Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Semantic-Versioning-Guide)** - Version management and release process
+- **[Release Automation Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Release-Automation-Guide)** - Automated releases and Discord notifications
 
 ### External Resources
 - [Nextcloud Talk Official Documentation](https://docs.nextcloud.com/server/latest/user_manual/en/talk/index.html)
 - [Ollama Official Site](https://ollama.com/)
 - [xAI API Documentation](https://docs.x.ai/)
+
+## 🏷️ Versioning
+
+NextCraftTalk follows [Semantic Versioning 2.0.0](https://semver.org/). For details on our versioning strategy and release process, see our [Semantic Versioning Guide](https://github.com/Wicz-Cloud/NextCraftTalk/wiki/Semantic-Versioning-Guide).
+
+### Current Version
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Wicz-Cloud/NextCraftTalk/releases)
+
+### Release History
+See [CHANGELOG.md](CHANGELOG.md) for detailed release notes and version history.
 
 ## 🤝 Contributing
 
