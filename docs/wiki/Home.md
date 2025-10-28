@@ -15,6 +15,8 @@ Welcome to the NextCraftTalk project wiki! This wiki provides quick reference gu
 ### Development
 - [Makefile Commands & Scenarios](Makefile-Commands-&-Scenarios) - Development workflow and deployment scenarios
 - [Project Documentation](Project-Documentation) - Links to full project docs and READMEs
+- [Release Automation Guide](Release-Automation-Guide) - Automated release processes and version management
+- [Semantic Versioning Guide](Semantic-Versioning-Guide) - Version management and release strategy
 
 ## Getting Help
 - Join our [Discord community](https://discord.gg/D2vFfQW4Nm) for discussions and support

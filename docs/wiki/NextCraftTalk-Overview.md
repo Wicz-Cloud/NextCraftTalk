@@ -17,6 +17,8 @@ NextCraftTalk is a Minecraft knowledge chatbot that integrates with Nextcloud Ta
 - **🎭 Dynamic Prompts** - Edit bot personality without container restarts
 - **👀 Auto-Reload** - Prompt changes detected automatically via file watching
 - **🔊 Configurable Logging** - Control verbosity levels for monitoring
+- **🛡️ Content Safety** - Automatic profanity filtering and content moderation
+- **🔒 Privacy-Focused** - Optional Google Perspective API integration for enhanced safety
 
 ## Deployment Modes
 
@@ -24,12 +26,14 @@ NextCraftTalk is a Minecraft knowledge chatbot that integrates with Nextcloud Ta
 - Uses x.ai for AI responses (lightweight, cloud-based)
 - No local AI infrastructure required
 - Perfect for cloud deployments
+- Integrated content safety filtering
 
 ### Self-Hosted Mode
 - Full local AI stack with Ollama, ChromaDB, and RAG pipeline
 - Vector database (ChromaDB) for knowledge base
 - Web scraping capabilities
 - RAG pipeline for enhanced responses
+- Local content safety processing
 
 ## Quick Start
 
@@ -62,9 +66,15 @@ NextCraftTalk/
 │   ├── core/          # Configuration & shared logic
 │   ├── modes/         # Mode-specific implementations
 │   │   ├── external_ai/    # x.ai integration
+│   │   │   ├── bot/        # External AI bot logic
+│   │   │   └── api/        # xAI API client
 │   │   └── self_hosted/    # Local AI stack
-│   ├── shared/        # Common utilities
-│   └── bot/           # Core bot logic
+│   │       ├── bot/        # Self-hosted bot logic
+│   │       └── vector_db/  # Vector database integration
+│   ├── shared/        # Common utilities & safety
+│   │   ├── safety_filter.py    # Content safety filtering
+│   │   └── utils.py            # Shared utilities
+│   └── main.py        # Application entry point
 ├── docker/            # Container configurations
 ├── scripts/           # Deployment scripts
 └── tests/             # Test suite

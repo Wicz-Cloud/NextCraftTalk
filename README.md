@@ -74,9 +74,15 @@ NextCraftTalk/
 │   ├── core/          # Configuration & shared logic
 │   ├── modes/         # Mode-specific implementations
 │   │   ├── external_ai/    # x.ai integration
+│   │   │   ├── bot/        # External AI bot logic
+│   │   │   └── api/        # xAI API client
 │   │   └── self_hosted/    # Local AI stack
-│   ├── shared/        # Common utilities
-│   └── bot/           # Core bot logic
+│   │       ├── bot/        # Self-hosted bot logic
+│   │       └── vector_db/  # Vector database integration
+│   ├── shared/        # Common utilities & safety
+│   │   ├── safety_filter.py    # Content safety filtering
+│   │   └── utils.py            # Shared utilities
+│   └── main.py        # Application entry point
 ├── docker/            # Container configurations
 ├── scripts/           # Deployment scripts
 └── tests/             # Test suite
