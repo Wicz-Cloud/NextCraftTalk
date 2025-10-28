@@ -9,9 +9,7 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "Wicz-Cloud"
-    assignees:
-      - "Wicz-Cloud"
+      - "webwicz"
     commit-message:
       prefix: "deps"
       prefix-development: "deps-dev"
@@ -26,9 +24,7 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "Wicz-Cloud"
-    assignees:
-      - "Wicz-Cloud"
+      - "webwicz"
     commit-message:
       prefix: "docker"
       include: "scope"
@@ -41,9 +37,7 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "Wicz-Cloud"
-    assignees:
-      - "Wicz-Cloud"
+      - "webwicz"
     commit-message:
       prefix: "docker"
       include: "scope"
@@ -57,9 +51,9 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "Wicz-Cloud"
+      - "webwicz"
     assignees:
-      - "Wicz-Cloud"
+      - "webwicz"
     commit-message:
       prefix: "ci"
       include: "scope"
