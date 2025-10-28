@@ -34,6 +34,7 @@ A self-hosted Minecraft knowledge chatbot that answers questions using x.ai's Gr
 - **🎭 Dynamic Prompts** - Edit bot personality without container restarts
 - **👀 Auto-Reload** - Prompt changes detected automatically via file watching
 - **🔊 Configurable Logging** - Control verbosity levels for monitoring
+- **🛡️ Content Safety** - Built-in profanity filtering and toxicity detection
 
 ## 🚀 Quick Start
 
@@ -133,6 +134,13 @@ NETWORK_NAME=nextcloud-aio
 
 # Optional: Logging
 LOG_LEVEL=INFO
+
+# Optional: Content Safety
+ENABLE_SAFETY_FILTER=true
+PROFANITY_THRESHOLD=0.6
+TOXICITY_THRESHOLD=0.7
+CENSOR_REPLACEMENT=[REDACTED]
+PERSPECTIVE_API_KEY=your-google-perspective-api-key-here
 ```
 
 ### Nextcloud Setup
@@ -147,6 +155,54 @@ LOG_LEVEL=INFO
 1. **Visit x.ai**: Go to [x.ai](https://x.ai) and create an account
 2. **Get API Key**: Navigate to API settings and generate a new key
 3. **Test Connection**: The bot will validate the key on startup
+
+## 🛡️ Content Safety
+
+NextCraftTalk-EXT includes comprehensive content safety features to ensure appropriate responses for all users, especially children.
+
+### Safety Features
+
+- **Profanity Filtering**: Automatic detection and censoring of inappropriate language using the `profanity-check` library
+- **Toxicity Detection**: Integration with Google Perspective API for advanced content analysis
+- **Configurable Thresholds**: Adjustable sensitivity levels for different environments
+- **Safe Fallbacks**: Kid-friendly alternative responses when unsafe content is detected
+
+### Safety Configuration
+
+Configure safety features in your `.env` file:
+
+```env
+# Enable/disable safety filtering
+ENABLE_SAFETY_FILTER=true
+
+# Profanity detection threshold (0.0-1.0, higher = more sensitive)
+PROFANITY_THRESHOLD=0.6
+
+# Toxicity detection threshold (0.0-1.0, higher = more sensitive)
+TOXICITY_THRESHOLD=0.7
+
+# Replacement text for censored content
+CENSOR_REPLACEMENT=[REDACTED]
+
+# Google Perspective API key (optional, enhances toxicity detection)
+PERSPECTIVE_API_KEY=your-google-perspective-api-key-here
+```
+
+### How It Works
+
+1. **Profanity Check**: Each response is scanned for inappropriate language
+2. **Toxicity Analysis**: Content is analyzed for harmful or toxic elements
+3. **Content Filtering**: Unsafe content is either censored or replaced with safe alternatives
+4. **Fallback Responses**: When content cannot be made safe, friendly alternatives are provided
+
+### Google Perspective API Setup
+
+For enhanced toxicity detection:
+
+1. **Visit Google Cloud Console**: Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. **Enable Perspective API**: Search for "Perspective API" and enable it
+3. **Create API Key**: Generate an API key for your project
+4. **Configure Environment**: Add the key to your `.env` file
 
 ## 🎯 Usage
 

@@ -168,6 +168,50 @@ Grok can analyze images and perform OCR:
 }
 ```
 
+## Content Safety Integration
+
+NextCraftTalk integrates content safety features with xAI API responses to ensure appropriate content for all users.
+
+### Safety Features
+
+- **Profanity Filtering**: Automatic detection and censoring using `profanity-check` library
+- **Toxicity Detection**: Google Perspective API integration for comprehensive content analysis
+- **Response Filtering**: Unsafe content is filtered before delivery to users
+- **Fallback Responses**: Safe alternatives provided when content cannot be made appropriate
+
+### Implementation
+
+```python
+# Example safety filter integration
+from src.shared.safety_filter import apply_safety_filter
+
+# After receiving xAI response
+raw_response = xai_api_response["choices"][0]["message"]["content"]
+safe_response, is_safe = apply_safety_filter(raw_response)
+
+if not is_safe:
+    # Use safe fallback response
+    final_response = "Let's keep it fun and safe! Ask me about building cool Minecraft stuff!"
+else:
+    final_response = safe_response
+```
+
+### Configuration
+
+Control safety features via environment variables:
+
+```env
+# Enable/disable safety filtering
+ENABLE_SAFETY_FILTER=true
+
+# Detection thresholds (0.0-1.0)
+PROFANITY_THRESHOLD=0.6
+TOXICITY_THRESHOLD=0.7
+
+# Google Perspective API key for enhanced detection
+PERSPECTIVE_API_KEY=your_api_key_here
+```
+
 ## Best Practices
 
 1. **Secure API Keys**: Never expose keys in client-side code

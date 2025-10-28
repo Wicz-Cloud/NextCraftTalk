@@ -11,6 +11,7 @@
 - **Nextcloud Talk Integration**: Seamless webhook-based chat integration
 - **Mode Switching**: Simple `.env` configuration to switch between modes
 - **Docker Support**: Containerized deployment for both modes
+- **Content Safety**: Built-in profanity filtering and toxicity detection
 
 ## 🚀 Quick Start
 
@@ -195,6 +196,7 @@ NextCraftTalk takes security seriously with comprehensive automated security sca
 - **Dependency Monitoring**: Automated dependency updates and vulnerability detection
 - **Secure Defaults**: Localhost-only server bindings by default
 - **SARIF Integration**: Security findings uploaded to GitHub Security tab
+- **Content Safety**: Profanity filtering and toxicity detection for kid-friendly responses
 
 ### Security Scanning
 The project includes automated security scanning via GitHub Actions:
@@ -202,6 +204,14 @@ The project includes automated security scanning via GitHub Actions:
 - **Dependency Security**: Safety and pip-audit for vulnerable dependencies
 - **Container Security**: Trivy scans for Docker image vulnerabilities
 - **Weekly Audits**: Automated security scans every Monday
+
+### Content Safety
+NextCraftTalk includes built-in content safety features to ensure appropriate responses:
+- **Profanity Filtering**: Automatic detection and censoring using `profanity-check` library
+- **Toxicity Detection**: Google Perspective API integration for comprehensive content analysis
+- **Configurable Thresholds**: Adjustable sensitivity levels via environment variables
+- **Safe Fallbacks**: Kid-friendly alternative responses when unsafe content is detected
+- **Environment Controls**: Enable/disable features with `ENABLE_SAFETY_FILTER` variable
 
 ### Security Best Practices
 - **Server Binding**: Default to `127.0.0.1` instead of `0.0.0.0` for local access only
