@@ -15,6 +15,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Repository structure modernized with professional Python standards
 
+## [1.1.0] - 2025-10-27
+
+### Added
+- **Content Safety Filtering**: Comprehensive profanity and toxicity detection for external AI mode
+- **Profanity Detection**: Automatic inappropriate language filtering using `profanity-check` library
+- **Toxicity Analysis**: Google Perspective API integration for advanced content safety
+- **Configurable Safety Settings**: Environment variable controls for sensitivity thresholds
+- **Safe Fallback Responses**: Kid-friendly alternatives when unsafe content is detected
+- **Safety Filter Module**: Shared `src/shared/safety_filter.py` for consistent content filtering
+
+### Changed
+- **External AI Pipeline**: Enhanced with safety filtering for all x.ai responses
+- **Dependencies**: Added `profanity-check` and `google-api-python-client` to external requirements
+- **Documentation**: Updated README, external AI docs, and xAI API wiki with safety features
+- **Environment Configuration**: New safety-related environment variables
+
+### Technical Details
+- **Safety Thresholds**: Configurable profanity (default: 0.6) and toxicity (default: 0.7) levels
+- **Graceful Degradation**: Safety features work without optional dependencies
+- **Performance**: Minimal overhead with efficient filtering algorithms
+- **Extensibility**: Modular design for future safety enhancements
+
 ## [1.0.2] - 2025-10-26
 
 ### Security
