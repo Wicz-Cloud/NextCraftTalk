@@ -1,5 +1,4 @@
 # Core dependencies
-pip>=24.0  # Security: Ensure pip has symbolic link extraction checks for External AI mode
 python-dotenv>=1.0.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
@@ -15,13 +14,13 @@ watchdog>=3.0.0
 # Force urllib3 update for security - monitoring for CVE-2025-50181 and CVE-2025-50182 fixes
 urllib3>=2.5.0
 
+# Content safety
+profanity-check
+google-api-python-client>=2.135
+
 # Development dependencies (optional for production)
 pytest>=8.0.0
 black>=24.0.0
 flake8>=7.0.0
 mypy>=1.8.0
 pre-commit>=3.6.0
-
-
-profanity-check
-google-api-python-client>=2.135
