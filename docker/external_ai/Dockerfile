@@ -5,9 +5,12 @@ FROM python:3.14-alpine
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and build tools
 RUN apk add --no-cache \
-    curl \
+    curl=8.10.1-r0 \
+    build-base=0.5-r3 \
+    gcc=13.2.1_git20240309-r0 \
+    g++=13.2.1_git20240309-r0 \
     && rm -rf /var/cache/apk/*
 
 # Copy requirements first for better caching
@@ -16,11 +19,9 @@ COPY requirements-external.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements-external.txt
 
-# Copy source code
-COPY src/ ./src/
-
-# Create non-root user
-RUN adduser -D -h /home/app -s /bin/sh app \
+# Remove build dependencies and create non-root user
+RUN apk del build-base gcc g++ \
+    && adduser -D -h /home/app -s /bin/sh app \
     && chown -R app:app /app
 USER app
 

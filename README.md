@@ -223,6 +223,7 @@ NextCraftTalk includes built-in content safety features to ensure appropriate re
 - **Server Binding**: Default to `127.0.0.1` instead of `0.0.0.0` for local access only
 - **HTTP Timeouts**: Proper timeout handling for API calls (30s for tags, 300s for model pulls)
 - **Dependency Pinning**: Secure versions of dependencies with vulnerability fixes
+- **Virtual Environment Isolation**: Uses isolated Python environments to protect against system-level pip vulnerabilities
 - **Container Hardening**: Non-root users and minimal attack surface
 
 ### Reporting Security Issues

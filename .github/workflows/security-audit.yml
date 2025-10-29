@@ -23,6 +23,19 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Validate pip version security
+        run: |
+          pip_version=$(python -m pip --version | grep -oP '\d+\.\d+\.\d+')
+          echo "Current pip version: $pip_version"
+          # pip 25.3+ contains security fixes for CVE-2025-8869
+          if [[ "$(printf '%s\n' "$pip_version" "25.3.0" | sort -V | head -n1)" = "25.3.0" ]]; then
+            echo "✅ Pip version $pip_version is secure"
+          else
+            echo "❌ Pip version $pip_version may be vulnerable to CVE-2025-8869"
+            echo "Consider upgrading pip: python -m pip install --upgrade pip"
+            exit 1
+          fi
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
