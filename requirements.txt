@@ -1,9 +1,9 @@
 # Core dependencies
-pip>=24.0  # Security: Ensure pip has symbolic link extraction checks
 python-dotenv>=1.0.0
 pydantic>=2.0.0
 pydantic-settings>=2.0.0
 fastapi>=0.104.0
+starlette>=0.49.1  # Security: Fix O(n^2) DoS in FileResponse Range header merging
 uvicorn>=0.24.0
 requests>=2.33.0
 python-multipart>=0.0.6
