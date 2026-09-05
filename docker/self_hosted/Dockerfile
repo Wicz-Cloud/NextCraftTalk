@@ -8,17 +8,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Ollama (optional - can be run separately)
-# RUN curl -fsSL https://ollama.ai/install.sh | sh
-
 # Set working directory
 WORKDIR /app
 
 # Copy requirements first for better caching
 COPY requirements-selfhosted.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements-selfhosted.txt
+# Upgrade pip before install (CVE-2025-8869 requires >=25.3), then deps
+RUN python -m pip install --upgrade "pip>=25.3" \
+    && pip install --no-cache-dir -r requirements-selfhosted.txt
 
 # Copy source code
 COPY src/ ./src/
