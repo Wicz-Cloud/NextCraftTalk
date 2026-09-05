@@ -21,7 +21,9 @@ pre-commit>=3.5.0
 # Optional: Add mode-specific dependencies as needed
 # For external AI mode: openai>=1.0.0 (if using OpenAI-compatible API)
 # For self-hosted mode:
-chromadb==1.4.0
+# chromadb: bumped to latest PyPI (1.5.9). Open critical/high CVEs remain for <=1.5.9;
+# first_patched_version is null upstream — monitor and bump when a real patch ships.
+chromadb==1.5.9
 sentence-transformers==5.2.3
 beautifulsoup4>=4.12.0
 lxml>=6.1.0
