@@ -26,13 +26,22 @@ jobs:
       - name: Upgrade pip (CVE-2025-8869 requires >=25.3)
         run: |
           python -m pip install --upgrade "pip>=25.3"
-          pip_version=$(python -m pip --version | grep -oP '\d+\.\d+(?:\.\d+)?')
-          echo "Current pip version: $pip_version"
-          if [[ "$(printf '%s\n' "25.3" "$pip_version" | sort -V | head -n1)" != "25.3" ]]; then
-            echo "❌ Pip version $pip_version is still below 25.3"
-            exit 1
-          fi
-          echo "✅ Pip version $pip_version is secure"
+          # Use pip's own version API — do not regex `pip --version` (path contains 3.11.x).
+          python - <<'PY'
+          import pip
+          import sys
+
+          def parse(v: str):
+              return tuple(int(p) for p in v.split(".")[:3])
+
+          current = parse(pip.__version__)
+          required = (25, 3, 0)
+          print(f"Current pip version: {pip.__version__}")
+          if current < required:
+              print(f"❌ Pip version {pip.__version__} is still below 25.3")
+              sys.exit(1)
+          print(f"✅ Pip version {pip.__version__} is secure")
+          PY
 
       - name: Install dependencies
         run: |
@@ -49,7 +58,6 @@ jobs:
         run: |
           pip install safety
           # Soft-fail: chromadb has open critical/high CVEs with no upstream patched release yet (<=1.5.9).
-          # Keep reporting so we notice when a fix lands; do not hard-block CI on known-unpatched.
           if ! safety check --full-report; then
             echo "::warning::safety reported vulnerabilities (expected while chromadb remains unpatched upstream)"
           fi
