@@ -113,31 +113,13 @@ jobs:
 
       - name: Ensure valid SARIF files
         run: |
-          write_empty_sarif() {
-            cat > "$1" <<'SARIF'
-          {
-            "version": "2.1.0",
-            "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-            "runs": [{
-              "tool": {
-                "driver": {
-                  "name": "Trivy",
-                  "version": "latest",
-                  "informationUri": "https://github.com/aquasecurity/trivy"
-                }
-              },
-              "results": []
-            }]
-          }
-          SARIF
-          }
           for file in trivy-external-results.sarif trivy-selfhosted-results.sarif; do
             echo "Validating $file..."
             if [ -f "$file" ] && jq empty "$file" 2>/dev/null; then
               echo "✅ $file is valid JSON"
             else
               echo "❌ $file missing or invalid; writing minimal SARIF"
-              write_empty_sarif "$file"
+              python -c 'import json,sys; p={"version":"2.1.0","runs":[{"tool":{"driver":{"name":"Trivy","version":"latest","informationUri":"https://github.com/aquasecurity/trivy"}},"results":[]}]}; json.dump(p, open(sys.argv[1],"w")); print("wrote", sys.argv[1])' "$file"
             fi
           done
 
