@@ -17,7 +17,7 @@ urllib3>=2.5.0
 
 # Content safety
 profanity-check
-google-api-python-client>=2.135
+google-api-python-client>=2.200.0
 
 # Development dependencies (optional for production)
 pytest>=8.0.0
