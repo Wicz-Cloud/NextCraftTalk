@@ -34,7 +34,7 @@ pillow>=12.2.0  # Fix out-of-bounds write on PSD images
 protobuf>=7.36.1  # Fix JSON recursion depth bypass
 pyasn1>=0.6.4  # Fix DoS in decoder
 virtualenv>=20.36.1  # Fix TOCTOU directory creation
-filelock>=3.20.3  # Fix TOCTOU symlink attacks
+filelock>=3.32.5  # Fix TOCTOU symlink attacks
 
 # Force urllib3 update for security
 urllib3>=2.7.0  # Fix decompression bomb + redirect chain vulnerabilities
