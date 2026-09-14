@@ -1,0 +1,192 @@
+name: Monthly patch release
+
+on:
+  schedule:
+    # 1st of each month at 13:00 UTC ≈ 9:00 AM Eastern (EDT); 8:00 AM EST in winter
+    - cron: "0 13 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: monthly-patch-release
+  cancel-in-progress: false
+
+jobs:
+  patch-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Decide whether to release
+        id: decide
+        run: |
+          set -euo pipefail
+          VERSION=$(tr -d '[:space:]' < VERSION)
+          echo "VERSION file: $VERSION"
+
+          # Prefer newest v*.*.* tag; else newest bare X.Y.Z tag
+          LAST_V=$(git tag -l 'v*.*.*' --sort=-v:refname | head -n1 || true)
+          LAST_BARE=$(git tag -l '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1 || true)
+          if [ -n "$LAST_V" ]; then
+            BASE_REF="$LAST_V"
+          elif [ -n "$LAST_BARE" ]; then
+            BASE_REF="$LAST_BARE"
+          else
+            BASE_REF=""
+          fi
+          echo "Last release ref: ${BASE_REF:-<none>}"
+
+          if [ -z "$BASE_REF" ]; then
+            COUNT=$(git rev-list --count HEAD)
+          else
+            COUNT=$(git rev-list --count "${BASE_REF}..HEAD")
+          fi
+          echo "Commits since last release: $COUNT"
+          echo "commit_count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing new on main since last release — skipping."
+          else
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.decide.outputs.should_release == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Bump patch and open release PR
+        if: steps.decide.outputs.should_release == 'true'
+        id: bump
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="chore/monthly-patch-$(date -u +%Y-%m)"
+          git checkout -b "$BRANCH"
+
+          OLD=$(tr -d '[:space:]' < VERSION)
+          python scripts/version_manager.py bump --type patch
+          NEW=$(tr -d '[:space:]' < VERSION)
+          echo "Bumped $OLD → $NEW"
+          echo "new_version=$NEW" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+          BASE_REF="${{ steps.decide.outputs.base_ref }}"
+          {
+            echo "## Monthly patch $NEW"
+            echo
+            echo "Automated first-of-month patch release."
+            echo
+            echo "### Commits since ${BASE_REF:-start}"
+            if [ -n "$BASE_REF" ]; then
+              git log --oneline "${BASE_REF}..HEAD" | head -n 80
+            else
+              git log --oneline -n 40
+            fi
+          } > /tmp/release-notes.md
+
+          # Light CHANGELOG prepend if file exists
+          if [ -f CHANGELOG.md ]; then
+            {
+              echo "## $NEW — $(date -u +%Y-%m-%d)"
+              echo
+              echo "Monthly patch release (Dependabot + maintenance)."
+              echo
+              if [ -n "$BASE_REF" ]; then
+                git log --pretty='- %s' "${BASE_REF}..HEAD" | head -n 60
+              fi
+              echo
+              cat CHANGELOG.md
+            } > /tmp/CHANGELOG.md
+            mv /tmp/CHANGELOG.md CHANGELOG.md
+          fi
+
+          git add VERSION CHANGELOG.md 2>/dev/null || git add VERSION
+          git commit -m "chore(release): bump version to ${NEW}"
+          git push -u origin "$BRANCH"
+
+          PR_URL=$(gh pr create \
+            --title "chore(release): monthly patch ${NEW}" \
+            --body-file /tmp/release-notes.md \
+            --base main \
+            --head "$BRANCH")
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          PR_NUM=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+          echo "pr_number=$PR_NUM" >> "$GITHUB_OUTPUT"
+          echo "Opened $PR_URL"
+
+      - name: Wait for CI and merge release PR
+        if: steps.decide.outputs.should_release == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.bump.outputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 90); do
+            gh pr checks "$PR" --repo "$REPO" > /tmp/checks.txt 2>&1 || true
+            if grep -qE $'\t(fail|failing|cancelled|timed_out)\t' /tmp/checks.txt; then
+              echo "Release PR checks failed:"
+              cat /tmp/checks.txt
+              exit 1
+            fi
+            bad=$(awk -F'\t' 'NF>=2 && $2!="pass" && $2!="skipping" && $2!="neutral" {print}' /tmp/checks.txt | wc -l)
+            if [ "$bad" -eq 0 ] && [ -s /tmp/checks.txt ]; then
+              echo "Checks green — merging release PR #$PR"
+              gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
+              exit 0
+            fi
+            echo "Attempt $i: waiting on checks..."
+            cat /tmp/checks.txt || true
+            sleep 30
+          done
+          echo "Timed out waiting for release PR CI"
+          exit 1
+
+      - name: Tag v-version on main (triggers release.yml)
+        if: steps.decide.outputs.should_release == 'true'
+        env:
+          NEW: ${{ steps.bump.outputs.new_version }}
+        run: |
+          set -euo pipefail
+          git checkout main
+          git pull origin main
+          TAG="v${NEW}"
+          # Ensure VERSION on main matches
+          MAIN_VER=$(tr -d '[:space:]' < VERSION)
+          if [ "$MAIN_VER" != "$NEW" ]; then
+            echo "VERSION on main is $MAIN_VER, expected $NEW"
+            exit 1
+          fi
+          git tag -a "$TAG" -m "Release version ${NEW}"
+          git push origin "$TAG"
+          echo "Pushed tag $TAG — release.yml should publish GitHub Release / PyPI / Docker."
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Monthly patch release"
+            echo "- Should release: ${{ steps.decide.outputs.should_release }}"
+            echo "- Commits since last: ${{ steps.decide.outputs.commit_count }}"
+            echo "- Base ref: ${{ steps.decide.outputs.base_ref }}"
+            echo "- New version: ${{ steps.bump.outputs.new_version }}"
+            echo "- PR: ${{ steps.bump.outputs.pr_url }}"
+          } >> "$GITHUB_STEP_SUMMARY"
