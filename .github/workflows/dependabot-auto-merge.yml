@@ -1,0 +1,128 @@
+name: Dependabot auto-merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  check_suite:
+    types: [completed]
+  workflow_run:
+    workflows:
+      - Security Audit
+      - Dependency Review
+      - Secret Scanning
+      - CodeQL
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for checks and merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          echo "Evaluating Dependabot PR #$PR"
+
+          # Poll checks for up to ~45 minutes (docker-security can take ~10m)
+          for i in $(seq 1 90); do
+            # Collect check conclusions (skip neutral/skipped)
+            mapfile -t ROWS < <(gh pr checks "$PR" --repo "$REPO" 2>/dev/null || true)
+            if [ ${#ROWS[@]} -eq 0 ]; then
+              echo "No checks yet (attempt $i); waiting..."
+              sleep 30
+              continue
+            fi
+
+            pending=0
+            failed=0
+            while IFS=$'\t' read -r name state rest; do
+              case "$state" in
+                pass|skipping|neutral) ;;
+                pending|queued|in_progress|"") pending=$((pending+1)) ;;
+                fail|failing|cancelled|timed_out|action_required)
+                  echo "Check failed: $name ($state)"
+                  failed=$((failed+1))
+                  ;;
+                *)
+                  # Unknown state — treat as pending
+                  pending=$((pending+1))
+                  ;;
+              esac
+            done < <(printf '%s\n' "${ROWS[@]}")
+
+            if [ "$failed" -gt 0 ]; then
+              echo "Refusing to merge — $failed failing check(s)."
+              exit 0
+            fi
+            if [ "$pending" -eq 0 ]; then
+              echo "All checks green — squash-merging PR #$PR"
+              gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
+              echo "Merged."
+              exit 0
+            fi
+            echo "Attempt $i: $pending check(s) still pending; sleeping 30s..."
+            sleep 30
+          done
+          echo "Timed out waiting for checks; leaving PR open."
+          exit 0
+
+  # When CI finishes after open, re-trigger merge evaluation via repository_dispatch-like path:
+  # workflow_run / check_suite don't carry PR number cleanly — use pull_request synchronize
+  # from Dependabot rebases. For suites that finish without a new synchronize, find open
+  # Dependabot PRs and merge any that are fully green.
+  merge-green-open:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge any fully-green Dependabot PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mapfile -t PRS < <(gh pr list --repo "$REPO" --author "app/dependabot" --state open --json number --jq '.[].number')
+          if [ ${#PRS[@]} -eq 0 ]; then
+            echo "No open Dependabot PRs."
+            exit 0
+          fi
+          for PR in "${PRS[@]}"; do
+            echo "Checking PR #$PR"
+            if ! gh pr checks "$PR" --repo "$REPO" >/tmp/checks.txt 2>&1; then
+              # gh pr checks exits non-zero when any pending/fail
+              if grep -qE $'\t(fail|failing|cancelled|timed_out)\t' /tmp/checks.txt; then
+                echo "PR #$PR has failures — skip"
+                continue
+              fi
+              if grep -qE $'\t(pending|queued|in_progress)\t' /tmp/checks.txt || grep -qi pending /tmp/checks.txt; then
+                echo "PR #$PR still pending — skip"
+                continue
+              fi
+            fi
+            # Double-check: every non-skipping row is pass
+            if awk -F'\t' '$2!="pass" && $2!="skipping" && $2!="neutral" { bad=1 } END { exit bad+0 }' /tmp/checks.txt 2>/dev/null; then
+              :
+            else
+              # regenerate
+              gh pr checks "$PR" --repo "$REPO" > /tmp/checks.txt 2>&1 || true
+            fi
+            bad=$(awk -F'\t' 'NF>=2 && $2!="pass" && $2!="skipping" && $2!="neutral" {print}' /tmp/checks.txt | wc -l)
+            if [ "$bad" -ne 0 ]; then
+              echo "PR #$PR not fully green yet:"
+              cat /tmp/checks.txt
+              continue
+            fi
+            echo "PR #$PR fully green — merging"
+            gh pr merge "$PR" --repo "$REPO" --squash --delete-branch && echo "Merged #$PR" || echo "Merge failed for #$PR (may need rebase)"
+          done
