@@ -242,3 +242,27 @@ For issues with release automation:
 4. Consult the troubleshooting section above
 
 For questions about versioning or releases, see the [Semantic Versioning Guide](Semantic-Versioning-Guide.md).
+
+## Monthly patch pipeline
+
+NextCraftTalk ships a **scheduled monthly patch** so Dependabot and other maintenance commits do not require an on-demand release.
+
+### What runs
+
+1. **Dependabot auto-merge** (`.github/workflows/dependabot-auto-merge.yml`)  
+   When a Dependabot PR is fully green (security-audit, docker-security, dependency-review, secret-scan, CodeQL, etc.), it is squash-merged automatically.
+
+2. **Monthly patch release** (`.github/workflows/monthly-patch-release.yml`)  
+   - **Schedule:** 1st of each month at 13:00 UTC (≈ 9:00 AM Eastern during EDT).  
+   - **Manual:** Actions → “Monthly patch release” → Run workflow.  
+   - If `main` has commits since the last release tag, the job bumps **patch** via `scripts/version_manager.py`, opens a short-lived release PR, merges it when CI is green, then pushes an annotated tag **`vX.Y.Z`** (note the `v` prefix so `release.yml` fires).  
+   - That tag triggers the existing Release workflow (GitHub Release, PyPI, Docker) and Discord notifications.  
+   - If there is nothing new since the last tag, the job exits successfully and does nothing.
+
+### Tag prefix
+
+Historic tags were bare (`1.1.0`). New automated releases use **`v1.1.1`** style tags so they match `release.yml` (`on.push.tags: v*.*.*`).
+
+### Turning it off
+
+Disable or delete the two workflows above, or pause Dependabot in repo settings.
