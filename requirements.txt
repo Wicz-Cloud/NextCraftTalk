@@ -31,7 +31,7 @@ requests>=2.33.0
 
 # Security: pin vulnerable transitive dependencies
 pillow>=12.3.0  # Fix out-of-bounds write on PSD images
-protobuf>=7.36.1  # Fix JSON recursion depth bypass
+protobuf>=7.36.2  # Fix JSON recursion depth bypass
 pyasn1>=0.6.4  # Fix DoS in decoder
 virtualenv>=21.7.14  # Fix TOCTOU directory creation
 filelock>=3.32.6  # Fix TOCTOU symlink attacks
