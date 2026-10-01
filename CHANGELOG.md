@@ -1,3 +1,61 @@
+## 1.1.1 — 2026-10-01
+
+Monthly patch release (Dependabot + maintenance).
+
+- deps(deps): update virtualenv requirement from >=21.7.14 to >=21.12.1 (#73)
+- deps(deps): update starlette requirement from >=1.6.0 to >=1.7.0 (#71)
+- deps(deps): bump sentence-transformers from 6.0.1 to 6.1.0 (#72)
+- deps(deps): update filelock requirement from >=4.0.0 to >=4.0.3 (#74)
+- ci(deps): bump actions/checkout from 4 to 7 (#69)
+- deps(deps): update filelock requirement from >=3.32.6 to >=4.0.0 (#68)
+- deps(deps): update protobuf requirement from >=7.36.1 to >=7.36.2 (#67)
+- ci(deps): bump actions/setup-python from 5 to 7 (#70)
+- deps(deps): update virtualenv requirement from >=21.7.9 to >=21.7.14 (#66)
+- ci: monthly patch release + Dependabot auto-merge (#65)
+- deps(deps): update filelock requirement from >=3.32.5 to >=3.32.6 (#64)
+- deps(deps): update virtualenv requirement from >=21.7.8 to >=21.7.9 (#63)
+- deps(deps): update pillow requirement from >=12.2.0 to >=12.3.0 (#56)
+- deps(deps): update virtualenv requirement from >=20.36.1 to >=21.7.8 (#55)
+- deps(deps): bump sentence-transformers from 5.2.3 to 6.0.1 (#60)
+- deps(deps): update starlette requirement from >=0.49.1 to >=1.6.0 (#53)
+- deps(deps): update filelock requirement from >=3.20.3 to >=3.32.5 (#57)
+- deps(deps): update protobuf requirement from >=6.33.5 to >=7.36.1 (#58)
+- deps(deps): update google-api-python-client requirement (#61)
+- ci(deps): bump actions/setup-python from 6 to 7 (#59)
+- ci(deps): bump actions/checkout from 6 to 7 (#52)
+- deps(deps): bump chromadb from 1.4.0 to 1.5.9 (#62)
+- deps(deps): update pyasn1 requirement from >=0.6.3 to >=0.6.4 (#54)
+- fix: unblock security CI and pin chromadb to latest available (#51)
+- security: batch update vulnerable dependencies (#49)
+- fix: remove javascript from CodeQL matrix to prevent false error (#32)
+- security: bump vulnerable dependencies (#31)
+- deps(deps): bump chromadb from 1.4.0 to 1.5.2 (#30)
+- ci(deps): bump actions/upload-artifact from 6 to 7 (#29)
+- deps(deps): bump sentence-transformers from 5.2.0 to 5.2.3 (#28)
+- deps(deps): bump urllib3 in the pip group across 1 directory (#23)
+- deps(deps): bump chromadb from 1.3.7 to 1.4.0 (#22)
+- deps(deps): bump urllib3 in the pip group across 1 directory (#17)
+- deps(deps): bump urllib3 from 2.5.0 to 2.6.2 (#18)
+- deps(deps): bump sentence-transformers from 5.1.2 to 5.2.0 (#19)
+- deps(deps): bump chromadb from 1.3.5 to 1.3.7 (#20)
+- ci(deps): bump actions/upload-artifact from 5 to 6 (#21)
+- deps(deps): bump chromadb from 1.3.4 to 1.3.5 (#16)
+- ci(deps): bump actions/checkout from 5 to 6 (#15)
+- deps(deps): bump chromadb from 1.2.2 to 1.3.4 (#14)
+- docker(deps): bump python in /docker/self_hosted (#13)
+- Security: Resolve pip CVE-2025-8869 and enhance CI/CD security
+- security: Update FastAPI to version compatible with secure Starlette
+- security: Fix Starlette O(n^2) DoS vulnerability in FileResponse
+- fix: Downgrade self-hosted Docker to Python 3.13 for chromadb compatibility
+- fix: Remove invalid assignees from dependabot.yml
+- fix: Remove pip from requirements-external.txt causing Docker build failure
+- docker(deps): bump python in /docker/external_ai (#8)
+- deps(deps): bump chromadb from 1.2.1 to 1.2.2 (#9)
+- ci(deps): bump actions/checkout from 4 to 5 (#11)
+- docker(deps): bump python in /docker/self_hosted (#10)
+- ci(deps): bump actions/setup-python from 5 to 6 (#12)
+- docs: Update documentation to reflect v1.1.0 architecture and features
+
 # Changelog
 
 All notable changes to NextCraftTalk will be documented in this file.
