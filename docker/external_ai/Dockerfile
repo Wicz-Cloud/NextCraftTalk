@@ -1,6 +1,6 @@
 # NextCraftTalk External AI Mode Dockerfile
 
-FROM python:3.14-alpine
+FROM python:3.15-alpine
 
 # Set working directory
 WORKDIR /app
