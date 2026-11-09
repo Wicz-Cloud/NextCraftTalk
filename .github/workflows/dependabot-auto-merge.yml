@@ -35,39 +35,35 @@ jobs:
           set -euo pipefail
           echo "Evaluating Dependabot PR #$PR"
 
+          # Check runs from this workflow (its own jobs) must not count, or this
+          # job waits on itself forever. Keep in sync with the job names below.
+          SELF_CHECKS='["auto-merge","merge-green-open"]'
+
           # Poll checks for up to ~45 minutes (docker-security can take ~10m)
           for i in $(seq 1 90); do
-            # Collect check conclusions (skip neutral/skipped)
-            mapfile -t ROWS < <(gh pr checks "$PR" --repo "$REPO" 2>/dev/null || true)
-            if [ ${#ROWS[@]} -eq 0 ]; then
+            # gh exits non-zero while checks are pending/failing; rely on the JSON instead.
+            CHECKS=$(gh pr checks "$PR" --repo "$REPO" --json name,state,bucket 2>/dev/null || true)
+            CHECKS=$(jq -c --argjson self "$SELF_CHECKS" \
+              '[.[]? | select(.name as $n | $self | index($n) | not)]' <<<"${CHECKS:-[]}" 2>/dev/null || echo '[]')
+            total=$(jq 'length' <<<"$CHECKS")
+            if [ "$total" -eq 0 ]; then
               echo "No checks yet (attempt $i); waiting..."
               sleep 30
               continue
             fi
 
-            pending=0
-            failed=0
-            while IFS=$'\t' read -r name state rest; do
-              case "$state" in
-                pass|skipping|neutral) ;;
-                pending|queued|in_progress|"") pending=$((pending+1)) ;;
-                fail|failing|cancelled|timed_out|action_required)
-                  echo "Check failed: $name ($state)"
-                  failed=$((failed+1))
-                  ;;
-                *)
-                  # Unknown state — treat as pending
-                  pending=$((pending+1))
-                  ;;
-              esac
-            done < <(printf '%s\n' "${ROWS[@]}")
+            # bucket: pass (incl. neutral) | skipping | pending | fail | cancel
+            failed=$(jq -r '.[] | select(.bucket == "fail" or .bucket == "cancel") | "\(.name) (\(.state))"' <<<"$CHECKS")
+            pending=$(jq '[.[] | select(.bucket != "pass" and .bucket != "skipping" and .bucket != "fail" and .bucket != "cancel")] | length' <<<"$CHECKS")
 
-            if [ "$failed" -gt 0 ]; then
-              echo "Refusing to merge — $failed failing check(s)."
-              exit 0
+            if [ -n "$failed" ]; then
+              echo "Check failed:"
+              echo "$failed"
+              echo "::error::Refusing to merge PR #$PR — failing/cancelled check(s)."
+              exit 1
             fi
             if [ "$pending" -eq 0 ]; then
-              echo "All checks green — squash-merging PR #$PR"
+              echo "All $total checks green — squash-merging PR #$PR"
               gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
               echo "Merged."
               exit 0
@@ -75,8 +71,8 @@ jobs:
             echo "Attempt $i: $pending check(s) still pending; sleeping 30s..."
             sleep 30
           done
-          echo "Timed out waiting for checks; leaving PR open."
-          exit 0
+          echo "::error::Timed out waiting for checks on PR #$PR; leaving PR open."
+          exit 1
 
   # When CI finishes after open, re-trigger merge evaluation via repository_dispatch-like path:
   # workflow_run / check_suite don't carry PR number cleanly — use pull_request synchronize
@@ -97,30 +93,27 @@ jobs:
             echo "No open Dependabot PRs."
             exit 0
           fi
+          # Ignore this workflow's own check runs (e.g. a still-running auto-merge job).
+          SELF_CHECKS='["auto-merge","merge-green-open"]'
           for PR in "${PRS[@]}"; do
             echo "Checking PR #$PR"
-            if ! gh pr checks "$PR" --repo "$REPO" >/tmp/checks.txt 2>&1; then
-              # gh pr checks exits non-zero when any pending/fail
-              if grep -qE $'\t(fail|failing|cancelled|timed_out)\t' /tmp/checks.txt; then
-                echo "PR #$PR has failures — skip"
-                continue
-              fi
-              if grep -qE $'\t(pending|queued|in_progress)\t' /tmp/checks.txt || grep -qi pending /tmp/checks.txt; then
-                echo "PR #$PR still pending — skip"
-                continue
-              fi
+            # gh exits non-zero while checks are pending/failing; rely on the JSON instead.
+            CHECKS=$(gh pr checks "$PR" --repo "$REPO" --json name,state,bucket 2>/dev/null || true)
+            CHECKS=$(jq -c --argjson self "$SELF_CHECKS" \
+              '[.[]? | select(.name as $n | $self | index($n) | not)]' <<<"${CHECKS:-[]}" 2>/dev/null || echo '[]')
+            if [ "$(jq 'length' <<<"$CHECKS")" -eq 0 ]; then
+              echo "PR #$PR has no checks reported — skip"
+              continue
             fi
-            # Double-check: every non-skipping row is pass
-            if awk -F'\t' '$2!="pass" && $2!="skipping" && $2!="neutral" { bad=1 } END { exit bad+0 }' /tmp/checks.txt 2>/dev/null; then
-              :
-            else
-              # regenerate
-              gh pr checks "$PR" --repo "$REPO" > /tmp/checks.txt 2>&1 || true
+            if jq -e 'any(.[]; .bucket == "fail" or .bucket == "cancel")' <<<"$CHECKS" >/dev/null; then
+              echo "::warning::PR #$PR has failing/cancelled checks — skip"
+              jq -r '.[] | select(.bucket == "fail" or .bucket == "cancel") | "  \(.name) (\(.state))"' <<<"$CHECKS"
+              continue
             fi
-            bad=$(awk -F'\t' 'NF>=2 && $2!="pass" && $2!="skipping" && $2!="neutral" {print}' /tmp/checks.txt | wc -l)
-            if [ "$bad" -ne 0 ]; then
+            # Every remaining check must be pass (incl. neutral) or skipping
+            if ! jq -e 'all(.[]; .bucket == "pass" or .bucket == "skipping")' <<<"$CHECKS" >/dev/null; then
               echo "PR #$PR not fully green yet:"
-              cat /tmp/checks.txt
+              jq -r '.[] | select(.bucket != "pass" and .bucket != "skipping") | "  \(.name) (\(.state))"' <<<"$CHECKS"
               continue
             fi
             echo "PR #$PR fully green — merging"
